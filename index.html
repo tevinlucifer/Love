@@ -812,6 +812,32 @@
         let mediaRecorder = null;
         let audioChunks = [];
 
+        // Helper function for requesting media stream with fallback options
+        async function getMediaStream(options = { video: true, audio: true }) {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error("MediaDevices API is not supported in this browser.");
+            }
+            try {
+                return await navigator.mediaDevices.getUserMedia(options);
+            } catch (err) {
+                // Fallback for mobile environment back/front facing modes
+                if (options.video) {
+                    try {
+                        return await navigator.mediaDevices.getUserMedia({
+                            ...options,
+                            video: { facingMode: "user" }
+                        });
+                    } catch (e) {
+                        return await navigator.mediaDevices.getUserMedia({
+                            ...options,
+                            video: true
+                        });
+                    }
+                }
+                throw err;
+            }
+        }
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const snapshot = await get(child(ref(db), `users/${user.uid}`));
@@ -911,13 +937,17 @@
             peer.on('call', async (call) => {
                 if (confirm("Incoming call! Accept?")) {
                     const isVideo = confirm("Enable video?");
-                    localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
-                    setupVideoUI(isVideo, localStream);
-                    call.answer(localStream);
-                    call.on('stream', (remoteStream) => {
-                        document.getElementById('remote-video').srcObject = remoteStream;
-                    });
-                    currentCall = call;
+                    try {
+                        localStream = await getMediaStream({ video: isVideo, audio: true });
+                        setupVideoUI(isVideo, localStream);
+                        call.answer(localStream);
+                        call.on('stream', (remoteStream) => {
+                            document.getElementById('remote-video').srcObject = remoteStream;
+                        });
+                        currentCall = call;
+                    } catch (e) {
+                        alert('Could not access camera/microphone. Please ensure permissions are allowed in site settings.');
+                    }
                 }
             });
 
@@ -972,7 +1002,7 @@
             const btn = document.getElementById('send-or-mic-btn');
             if (!isRecording) {
                 try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    const stream = await getMediaStream({ audio: true, video: false });
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
                     mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
@@ -989,7 +1019,9 @@
                     isRecording = true;
                     btn.style.background = '#f15c6d';
                     btn.innerHTML = '⏹️';
-                } catch (e) { alert('Microphone permission required!'); }
+                } catch (e) { 
+                    alert('Microphone permission required! Check site settings in your browser.'); 
+                }
             } else {
                 mediaRecorder.stop();
                 isRecording = false;
@@ -1119,10 +1151,12 @@
 
         window.openCamera = async function() {
             try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                cameraStream = await getMediaStream({ video: { facingMode: "environment" }, audio: false });
                 document.getElementById('camera-feed').srcObject = cameraStream;
                 document.getElementById('camera-screen').style.display = 'flex';
-            } catch (e) { alert('Camera access denied or unavailable.'); }
+            } catch (e) {
+                alert('Camera access denied or unavailable. Please enable camera permissions in your browser settings (Site Settings > Camera).');
+            }
         };
 
         window.closeCamera = function() {
@@ -1149,14 +1183,16 @@
         window.startCall = async function(videoEnabled) {
             const targetPeerId = myRole === 'boy' ? 'love-app-girl' : 'love-app-boy';
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: videoEnabled, audio: true });
+                localStream = await getMediaStream({ video: videoEnabled, audio: true });
                 setupVideoUI(videoEnabled, localStream);
                 const call = peer.call(targetPeerId, localStream);
                 call.on('stream', (remoteStream) => {
                     document.getElementById('remote-video').srcObject = remoteStream;
                 });
                 currentCall = call;
-            } catch (err) { alert("Microphone/Camera permission required!"); }
+            } catch (err) { 
+                alert("Microphone/Camera permission required! Make sure camera permissions are turned on for this website."); 
+            }
         };
 
         function setupVideoUI(videoEnabled, stream) {
