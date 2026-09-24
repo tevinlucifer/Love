@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp 💕</title>
+    <title>WhatsApp</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -11,38 +11,30 @@
         body, html { 
             width: 100%;
             height: 100%; 
-            margin: 0;
-            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #111b21;
-            overflow: hidden;
+            background-color: #0b141a;
             color: #e9edef;
+            overflow: hidden;
         }
 
         .app-container {
             width: 100%;
             height: 100%;
-            max-width: 100%;
-            max-height: 100%;
             position: relative;
-            background: #111b21;
-            overflow: hidden;
+            background: #0b141a;
             display: flex;
             flex-direction: column;
-            border-radius: 0;
-            border: none;
-            box-shadow: none;
         }
 
         /* Auth Screen */
         #auth-screen {
             height: 100%;
             width: 100%;
-            background: linear-gradient(rgba(11,20,26,0.7), rgba(11,20,26,0.7)), url('hands.png') center/cover no-repeat;
+            background: linear-gradient(rgba(11,20,26,0.85), rgba(11,20,26,0.85)), url('hands.png') center/cover no-repeat;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 20;
+            z-index: 50;
         }
 
         .auth-card {
@@ -76,10 +68,7 @@
             color: #00a884;
         }
 
-        .tab-btn.active {
-            background: #00a884;
-            color: #fff;
-        }
+        .tab-btn.active { background: #00a884; color: #fff; }
 
         .auth-card select, .auth-card input {
             width: 100%; padding: 10px 12px; margin-bottom: 10px;
@@ -91,9 +80,7 @@
             border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer;
         }
 
-        .error-msg {
-            color: #f15c6d; font-size: 13px; margin-bottom: 10px; display: none; font-weight: bold;
-        }
+        .error-msg { color: #f15c6d; font-size: 13px; margin-bottom: 10px; display: none; font-weight: bold; }
 
         /* Main View Container */
         #main-app {
@@ -101,14 +88,14 @@
             width: 100%;
             display: none;
             flex-direction: column;
-            background: #111b21;
+            background: #0b141a;
         }
 
-        /* Header */
+        /* Top Header */
         .wa-header {
-            background: #202c33;
+            background: #0b141a;
             color: #e9edef;
-            padding: 12px 16px 0 16px;
+            padding: 12px 16px 8px 16px;
             display: flex;
             flex-direction: column;
         }
@@ -117,82 +104,183 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             margin-bottom: 12px;
         }
-
-        .wa-header-top span { color: #00a884; font-size: 22px; }
 
         .wa-header-icons button {
             background: transparent;
             border: none;
             color: #aebac1;
-            font-size: 18px;
-            margin-left: 16px;
+            font-size: 20px;
+            margin-left: 18px;
             cursor: pointer;
         }
 
-        /* Tab Bar */
-        .wa-tabs {
+        /* Search Bar */
+        .search-container {
+            padding: 0 16px 10px 16px;
+        }
+
+        .search-bar {
+            background: #202c33;
+            border-radius: 20px;
+            padding: 8px 16px;
             display: flex;
-            justify-content: space-around;
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
+            align-items: center;
+            gap: 10px;
             color: #8696a0;
+            font-size: 14px;
         }
 
-        .wa-tab {
-            padding-bottom: 10px;
-            flex: 1;
+        .search-bar input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e9edef;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        /* Filter Pills */
+        .pills-bar {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 12px 16px;
+            overflow-x: auto;
+        }
+
+        .pill {
+            background: #202c33;
+            color: #8696a0;
+            padding: 6px 14px;
+            border-radius: 18px;
+            font-size: 13px;
+            white-space: nowrap;
             cursor: pointer;
-            text-align: center;
         }
 
-        .wa-tab.active {
-            color: #00a884;
-            border-bottom: 3px solid #00a884;
+        .pill.active {
+            background: #103629;
+            color: #25d366;
+            font-weight: bold;
         }
 
         /* Tab Panels */
-        .tab-content { display: none; flex: 1; overflow-y: auto; background: #111b21; }
+        .tab-content { display: none; flex: 1; overflow-y: auto; background: #0b141a; }
         .tab-content.active { display: block; }
 
-        /* Chat Panel (List View) */
+        /* Archived Item */
+        .archived-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            font-size: 15px;
+            font-weight: bold;
+            gap: 20px;
+            cursor: pointer;
+        }
+
+        .archived-item span.icon {
+            font-size: 18px;
+            color: #8696a0;
+            background: #202c33;
+            padding: 6px;
+            border-radius: 6px;
+        }
+
+        /* Chat Item */
         .chat-item {
             display: flex;
             align-items: center;
             padding: 12px 16px;
-            border-bottom: 1px solid #222d34;
             cursor: pointer;
         }
 
         .chat-item:hover { background: #202c33; }
 
         .avatar {
-            width: 48px;
-            height: 48px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             margin-right: 14px;
             object-fit: cover;
-            background: #6c757d;
         }
 
         .chat-info { flex: 1; }
-        .chat-name { font-weight: bold; font-size: 16px; color: #e9edef; display: flex; justify-content: space-between; }
+        .chat-name { font-weight: 600; font-size: 16px; color: #e9edef; display: flex; justify-content: space-between; }
         .chat-time { font-size: 12px; color: #8696a0; font-weight: normal; }
-        .chat-last-msg { font-size: 13px; color: #8696a0; margin-top: 4px; display: flex; justify-content: space-between; }
-        .unread-badge { background: #00a884; color: #111b21; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold; }
+        .chat-last-msg { font-size: 14px; color: #8696a0; margin-top: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .unread-badge { background: #25d366; color: #111b21; border-radius: 50%; padding: 2px 7px; font-size: 11px; font-weight: bold; }
 
-        /* Status & Calls Empty Views */
-        .status-item, .call-item {
-            padding: 16px;
+        /* Floating Action Buttons */
+        .fab-container {
+            position: absolute;
+            bottom: 75px;
+            right: 16px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 12px;
-            border-bottom: 1px solid #222d34;
+            z-index: 10;
         }
+
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: #25d366;
+            color: #111b21;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+
+        .fab-small {
+            width: 44px;
+            height: 44px;
+            background: #202c33;
+            color: #aebac1;
+            font-size: 18px;
+            align-self: center;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            height: 65px;
+            background: #111b21;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #202c33;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #8696a0;
+            font-size: 12px;
+            cursor: pointer;
+            width: 25%;
+        }
+
+        .nav-item .icon-wrapper {
+            padding: 4px 16px;
+            border-radius: 16px;
+            font-size: 18px;
+        }
+
+        .nav-item.active .icon-wrapper {
+            background: #103629;
+            color: #25d366;
+        }
+
+        .nav-item.active { color: #e9edef; font-weight: bold; }
 
         /* Individual Chat Room Screen */
         #chat-room {
@@ -201,7 +289,7 @@
             background: #0b141a url('twoofus.png') center/cover no-repeat;
             display: none;
             flex-direction: column;
-            z-index: 10;
+            z-index: 20;
         }
 
         .room-header {
@@ -211,23 +299,15 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
-        .room-header .back-btn {
-            background: none; border: none; color: #aebac1; font-size: 20px; cursor: pointer;
-        }
-
+        .room-header .back-btn { background: none; border: none; color: #aebac1; font-size: 20px; cursor: pointer; }
         .room-header .user-title { flex: 1; font-weight: bold; font-size: 16px; display: flex; flex-direction: column; }
-        .room-header .user-status { font-size: 11px; color: #00a884; font-weight: normal; }
-
-        .room-header button {
-            background: none; border: none; color: #aebac1; font-size: 18px; cursor: pointer; margin-left: 8px;
-        }
+        .room-header .user-status { font-size: 11px; color: #25d366; font-weight: normal; }
+        .room-header button { background: none; border: none; color: #aebac1; font-size: 18px; cursor: pointer; margin-left: 8px; }
 
         #chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
 
-        /* Left / Right Messages */
         .message {
             max-width: 75%;
             padding: 8px 12px;
@@ -236,41 +316,79 @@
             word-wrap: break-word;
             line-height: 1.4;
             position: relative;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
-        .sent {
-            background: #005c4b;
-            color: #e9edef;
-            align-self: flex-end;
-            border-top-right-radius: 0;
-        }
-
-        .received {
-            background: #202c33;
-            color: #e9edef;
-            align-self: flex-start;
-            border-top-left-radius: 0;
-        }
+        .sent { background: #005c4b; color: #e9edef; align-self: flex-end; border-top-right-radius: 0; }
+        .received { background: #202c33; color: #e9edef; align-self: flex-start; border-top-left-radius: 0; }
 
         .msg-meta {
-            font-size: 10px;
-            color: #8696a0;
-            float: right;
-            margin-left: 10px;
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            gap: 3px;
+            font-size: 10px; color: #8696a0; float: right; margin-left: 10px; margin-top: 4px; display: flex; align-items: center; gap: 3px;
         }
 
         .ticks { color: #53bdeb; font-weight: bold; }
 
-        /* Message Input Bar */
+        /* Input Area & Toolbars */
         .input-area { padding: 8px; background: #202c33; display: flex; gap: 8px; align-items: center; }
         .input-area button { background: none; border: none; font-size: 20px; color: #8696a0; cursor: pointer; }
         .input-area input { flex: 1; padding: 10px 14px; background: #2a3942; border: none; border-radius: 20px; outline: none; font-size: 14px; color: #fff; }
-        .send-btn { background: #00a884 !important; color: #111b21 !important; border: none; padding: 8px 12px; border-radius: 50%; cursor: pointer; }
+        .send-btn { background: #25d366 !important; color: #111b21 !important; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+
+        /* Attachment Drawer */
+        #attachment-drawer {
+            display: none;
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            background: #1f2c34;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px;
+            z-index: 25;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+
+        .drawer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+
+        .drawer-item { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; color: #aebac1; cursor: pointer; }
+        .drawer-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #fff; }
+
+        /* Emoji Picker Overlay */
+        #emoji-picker {
+            display: none;
+            height: 250px;
+            background: #111b21;
+            border-top: 1px solid #202c33;
+            padding: 10px;
+            overflow-y: auto;
+            z-index: 24;
+        }
+
+        .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; font-size: 22px; text-align: center; cursor: pointer; }
+
+        /* Camera Modal Screen */
+        #camera-screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #000;
+            z-index: 40;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 10px;
+        }
+
+        .camera-top { display: flex; justify-content: space-between; padding: 10px; font-size: 24px; color: #fff; }
+        .camera-viewport { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .camera-viewport video { width: 100%; height: 100%; object-fit: cover; }
+        .camera-bottom { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .shutter-btn { width: 70px; height: 70px; border-radius: 50%; border: 4px solid #fff; background: transparent; cursor: pointer; }
+        .camera-modes { display: flex; gap: 20px; background: #111b21; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; }
 
         /* Video Call Overlay */
         #video-container { display: none; background: #000; position: relative; height: 220px; width: 100%; }
@@ -278,59 +396,45 @@
         #local-video { width: 80px; height: 110px; position: absolute; bottom: 10px; right: 10px; border: 2px solid white; border-radius: 8px; z-index: 10; }
         .end-call-btn { position: absolute; top: 10px; right: 10px; background: #f15c6d; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; z-index: 11; font-weight: bold; }
 
-        /* Settings Drawer Overlay */
-        #settings-modal {
+        /* Settings Page View */
+        #settings-page {
             display: none;
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px);
+            background: #0b141a;
             z-index: 30;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
         }
 
-        .settings-card {
-            background: #1f2c34;
-            width: 85%;
-            max-width: 340px;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            border: 1px solid #2a3942;
-        }
-
-        .settings-card h3 { margin-bottom: 15px; color: #00a884; }
-        .setting-row { margin-bottom: 12px; text-align: left; }
-        .setting-row label { display: block; font-size: 13px; color: #8696a0; margin-bottom: 4px; font-weight: bold; }
-        .setting-row select, .setting-row input { width: 100%; padding: 8px; background: #111b21; border: 1px solid #2a3942; border-radius: 8px; color: #fff; }
-        .close-settings { width: 100%; padding: 10px; background: #00a884; color: #111b21; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        .logout-btn-settings { width: 100%; padding: 10px; background: #f15c6d; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 8px; cursor: pointer; }
+        .settings-header { display: flex; align-items: center; gap: 15px; padding: 16px; background: #202c33; font-size: 18px; font-weight: bold; }
+        .settings-header button { background: none; border: none; color: #aebac1; font-size: 20px; cursor: pointer; }
+        .settings-profile { display: flex; align-items: center; gap: 15px; padding: 20px 16px; border-bottom: 1px solid #202c33; }
+        .settings-list { flex: 1; overflow-y: auto; }
+        .setting-item { display: flex; align-items: center; gap: 20px; padding: 16px; cursor: pointer; }
+        .setting-item .icon { font-size: 20px; color: #8696a0; }
+        .setting-item .title { font-size: 16px; font-weight: 500; }
+        .setting-item .subtitle { font-size: 13px; color: #8696a0; margin-top: 2px; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <!-- Auth / Login View -->
+        <!-- Auth Screen -->
         <div id="auth-screen">
             <div class="auth-card">
                 <h2>WhatsApp 💕</h2>
-
                 <div class="tab-buttons">
                     <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
                     <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>
                 </div>
-
                 <div id="error-box" class="error-msg"></div>
 
-                <!-- Sign In Form -->
                 <div id="login-form">
                     <input type="text" id="login-email" placeholder="Email">
                     <input type="password" id="login-password" placeholder="Password">
                     <button class="auth-btn" onclick="handleLogin()">Sign In</button>
                 </div>
 
-                <!-- Create Account Form -->
                 <div id="register-form" style="display: none;">
                     <input type="text" id="reg-email" placeholder="Email">
                     <select id="reg-role">
@@ -344,70 +448,111 @@
             </div>
         </div>
 
-        <!-- Main WhatsApp Interface View -->
+        <!-- Main Interface -->
         <div id="main-app">
             <div class="wa-header">
                 <div class="wa-header-top">
                     <span>WhatsApp</span>
                     <div class="wa-header-icons">
-                        <button>📷</button>
-                        <button>🔍</button>
+                        <button onclick="openCamera()">📷</button>
                         <button onclick="openSettings()">⋮</button>
                     </div>
                 </div>
-                <div class="wa-tabs">
-                    <div class="wa-tab active" onclick="switchWaTab('chats')">Chats</div>
-                    <div class="wa-tab" onclick="switchWaTab('status')">Status</div>
-                    <div class="wa-tab" onclick="switchWaTab('calls')">Calls</div>
+
+                <div class="search-container">
+                    <div class="search-bar">
+                        🔍 <input type="text" placeholder="Ask Meta AI or Search">
+                    </div>
+                </div>
+
+                <div class="pills-bar">
+                    <div class="pill active">All</div>
+                    <div class="pill">Unread</div>
+                    <div class="pill">Favourites</div>
+                    <div class="pill">Groups</div>
+                    <div class="pill">+</div>
                 </div>
             </div>
 
-            <!-- Chats Tab Panel -->
+            <!-- Chats Tab -->
             <div id="tab-chats" class="tab-content active">
+                <div class="archived-item">
+                    <span class="icon">📥</span>
+                    <span>Archived</span>
+                </div>
+
                 <div class="chat-item" onclick="openChatRoom()">
                     <img src="twoofus.png" class="avatar" alt="avatar">
                     <div class="chat-info">
                         <div class="chat-name">
-                            <span id="partner-name">My Partner ❤️</span>
-                            <span class="chat-time" id="last-time">12:00 PM</span>
+                            <span id="partner-name">Nathasha🤍</span>
+                            <span class="chat-time" id="last-time">15:12</span>
                         </div>
                         <div class="chat-last-msg">
-                            <span id="last-msg-preview">Tap to open conversation...</span>
+                            <span id="last-msg-preview">✓ Photo</span>
                             <span class="unread-badge">1</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Status Tab Panel -->
-            <div id="tab-status" class="tab-content">
-                <div class="status-item">
-                    <img src="twoofus.png" class="avatar" style="border: 2px solid #00a884;" alt="My Status">
-                    <div>
-                        <div style="font-weight: bold;">My Status</div>
-                        <div style="font-size: 12px; color: #8696a0;">Tap to add status update</div>
-                    </div>
+            <!-- Updates Tab -->
+            <div id="tab-updates" class="tab-content">
+                <div style="padding: 16px;">
+                    <h3>Status Updates</h3>
+                    <p style="color: #8696a0; font-size: 14px; margin-top: 8px;">No recent status updates.</p>
                 </div>
             </div>
 
-            <!-- Calls Tab Panel -->
+            <!-- Communities Tab -->
+            <div id="tab-communities" class="tab-content">
+                <div style="padding: 16px;">
+                    <h3>Communities</h3>
+                    <p style="color: #8696a0; font-size: 14px; margin-top: 8px;">Stay connected with neighborhood groups and clubs.</p>
+                </div>
+            </div>
+
+            <!-- Calls Tab -->
             <div id="tab-calls" class="tab-content">
-                <div class="call-item">
-                    <div style="font-size: 24px;">📞</div>
-                    <div>
-                        <div style="font-weight: bold;">Recent Calls</div>
-                        <div style="font-size: 12px; color: #8696a0;">No recent calls made</div>
-                    </div>
+                <div style="padding: 16px;">
+                    <h3>Recent Calls</h3>
+                    <p style="color: #8696a0; font-size: 14px; margin-top: 8px;">No call history.</p>
                 </div>
             </div>
 
-            <!-- Active Chat Room Screen -->
+            <!-- Floating Action Buttons -->
+            <div class="fab-container">
+                <div class="fab fab-small">✨</div>
+                <div class="fab" onclick="openChatRoom()">+</div>
+            </div>
+
+            <!-- Bottom Navigation Bar -->
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="switchNavTab('chats', this)">
+                    <div class="icon-wrapper">💬</div>
+                    <span>Chats</span>
+                </div>
+                <div class="nav-item" onclick="switchNavTab('updates', this)">
+                    <div class="icon-wrapper">⭕</div>
+                    <span>Updates</span>
+                </div>
+                <div class="nav-item" onclick="switchNavTab('communities', this)">
+                    <div class="icon-wrapper">👥</div>
+                    <span>Communities</span>
+                </div>
+                <div class="nav-item" onclick="switchNavTab('calls', this)">
+                    <div class="icon-wrapper">📞</div>
+                    <span>Calls</span>
+                </div>
+            </div>
+
+            <!-- Active Chat Screen -->
             <div id="chat-room">
                 <div class="room-header">
                     <button class="back-btn" onclick="closeChatRoom()">←</button>
                     <img src="twoofus.png" class="avatar" style="width: 36px; height: 36px;" alt="avatar">
                     <div class="user-title">
-                        <span>My Partner ❤️</span>
+                        <span>Nathasha🤍</span>
                         <span class="user-status">online</span>
                     </div>
                     <button onclick="startCall(false)">📞</button>
@@ -423,46 +568,139 @@
 
                 <div id="chat-box"></div>
 
+                <!-- Attachment Drawer -->
+                <div id="attachment-drawer">
+                    <div class="drawer-grid">
+                        <div class="drawer-item" onclick="triggerFileInput()">
+                            <div class="drawer-icon" style="background: #7f66ff;">🖼️</div>
+                            <span>Gallery</span>
+                        </div>
+                        <div class="drawer-item" onclick="openCamera()">
+                            <div class="drawer-icon" style="background: #ff2e74;">📷</div>
+                            <span>Camera</span>
+                        </div>
+                        <div class="drawer-item">
+                            <div class="drawer-icon" style="background: #02a698;">📍</div>
+                            <span>Location</span>
+                        </div>
+                        <div class="drawer-item">
+                            <div class="drawer-icon" style="background: #00a884;">👤</div>
+                            <span>Contact</span>
+                        </div>
+                        <div class="drawer-item">
+                            <div class="drawer-icon" style="background: #5f66cd;">📄</div>
+                            <span>Document</span>
+                        </div>
+                        <div class="drawer-item">
+                            <div class="drawer-icon" style="background: #ffbc00;">📊</div>
+                            <span>Poll</span>
+                        </div>
+                        <div class="drawer-item">
+                            <div class="drawer-icon" style="background: #e6457d;">📅</div>
+                            <span>Event</span>
+                        </div>
+                        <div class="drawer-item">
+                            <div class="drawer-icon" style="background: #0088cc;">✨</div>
+                            <span>AI images</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emoji Picker -->
+                <div id="emoji-picker">
+                    <div class="emoji-grid">
+                        <span onclick="addEmoji('😢')">😢</span>
+                        <span onclick="addEmoji('😭')">😭</span>
+                        <span onclick="addEmoji('😂')">😂</span>
+                        <span onclick="addEmoji('🤨')">🤨</span>
+                        <span onclick="addEmoji('🙏')">🙏</span>
+                        <span onclick="addEmoji('👀')">👀</span>
+                        <span onclick="addEmoji('🎤')">🎤</span>
+                        <span onclick="addEmoji('😎')">😎</span>
+                        <span onclick="addEmoji('🤔')">🤔</span>
+                        <span onclick="addEmoji('🥺')">🥺</span>
+                        <span onclick="addEmoji('💀')">💀</span>
+                        <span onclick="addEmoji('🤭')">🤭</span>
+                        <span onclick="addEmoji('👍')">👍</span>
+                        <span onclick="addEmoji('😏')">😏</span>
+                        <span onclick="addEmoji('😁')">😁</span>
+                        <span onclick="addEmoji('🥴')">🥴</span>
+                        <span onclick="addEmoji('❤️')">❤️</span>
+                        <span onclick="addEmoji('💕')">💕</span>
+                        <span onclick="addEmoji('🔥')">🔥</span>
+                        <span onclick="addEmoji('🎉')">🎉</span>
+                    </div>
+                </div>
+
+                <input type="file" id="hidden-file-input" style="display: none;" accept="image/*" onchange="handleImageSend(event)">
+
                 <div class="input-area">
-                    <button>😊</button>
-                    <button>📎</button>
+                    <button onclick="toggleEmojiPicker()">😊</button>
+                    <button onclick="toggleAttachmentDrawer()">📎</button>
+                    <button onclick="openCamera()">📷</button>
                     <input type="text" id="message-input" placeholder="Message" onkeydown="if(event.key==='Enter') sendMessage()">
                     <button class="send-btn" onclick="sendMessage()">➔</button>
                 </div>
             </div>
-        </div>
 
-        <!-- Settings Modal -->
-        <div id="settings-modal">
-            <div class="settings-card">
-                <h3>Settings</h3>
-
-                <div class="setting-row">
-                    <label>Font Color</label>
-                    <input type="color" id="setting-color" value="#e9edef" onchange="updateFontColor(this.value)">
+            <!-- Camera Modal -->
+            <div id="camera-screen">
+                <div class="camera-top">
+                    <span onclick="closeCamera()" style="cursor: pointer;">✕</span>
+                    <span>⚡</span>
                 </div>
-
-                <div class="setting-row">
-                    <label>Wallpaper Background</label>
-                    <input type="file" id="setting-bg" accept="image/*" onchange="updateWallpaper(event)">
+                <div class="camera-viewport">
+                    <video id="camera-feed" autoplay playsinline muted></video>
                 </div>
-
-                <div class="setting-row">
-                    <label>Notification Ringtone</label>
-                    <select id="setting-ringtone">
-                        <option value="default.mp3">WhatsApp Tone</option>
-                        <option value="romantic.mp3">Chime Tone</option>
-                        <option value="silent">Silent</option>
-                    </select>
+                <div class="camera-bottom">
+                    <div class="camera-modes">
+                        <span>Video</span>
+                        <span style="color: #25d366;">Photo</span>
+                        <span>Video note</span>
+                    </div>
+                    <button class="shutter-btn" onclick="capturePhoto()"></button>
                 </div>
+            </div>
 
-                <button class="close-settings" onclick="closeSettings()">Save & Close</button>
-                <button class="logout-btn-settings" onclick="logout()">Log Out</button>
+            <!-- Settings Page -->
+            <div id="settings-page">
+                <div class="settings-header">
+                    <button onclick="closeSettings()">←</button>
+                    <span>Settings</span>
+                </div>
+                <div class="settings-profile">
+                    <img src="twoofus.png" class="avatar" style="width: 60px; height: 60px;">
+                    <div>
+                        <div style="font-size: 18px; font-weight: bold;">Tevi</div>
+                        <div style="font-size: 13px; color: #8696a0;">Hey there! I am using WhatsApp.</div>
+                    </div>
+                </div>
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <span class="icon">🔑</span>
+                        <div><div class="title">Account</div><div class="subtitle">Security notifications, change number</div></div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="icon">🔒</span>
+                        <div><div class="title">Privacy</div><div class="subtitle">Blocked accounts, disappearing messages</div></div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="icon">💬</span>
+                        <div><div class="title">Chats</div><div class="subtitle">Chat history, backup</div></div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="icon">🎨</span>
+                        <div><div class="title">Appearance</div><div class="subtitle">Chat theme, app icon, app theme</div></div>
+                    </div>
+                    <div class="setting-item" onclick="logout()">
+                        <span class="icon" style="color: #f15c6d;">🚪</span>
+                        <div><div class="title" style="color: #f15c6d;">Log Out</div><div class="subtitle">Sign out of your account</div></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase Modular Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -487,6 +725,7 @@
         let peer = null;
         let currentCall = null;
         let localStream = null;
+        let cameraStream = null;
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -517,11 +756,10 @@
             }
         };
 
-        window.switchWaTab = function(tabName) {
-            document.querySelectorAll('.wa-tab').forEach(t => t.classList.remove('active'));
+        window.switchNavTab = function(tabName, element) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-            event.target.classList.add('active');
+            element.classList.add('active');
             document.getElementById(`tab-${tabName}`).classList.add('active');
         };
 
@@ -596,22 +834,64 @@
         window.openChatRoom = function() { document.getElementById('chat-room').style.display = 'flex'; };
         window.closeChatRoom = function() { document.getElementById('chat-room').style.display = 'none'; };
 
-        window.openSettings = function() { document.getElementById('settings-modal').style.display = 'flex'; };
-        window.closeSettings = function() { document.getElementById('settings-modal').style.display = 'none'; };
+        window.openSettings = function() { document.getElementById('settings-page').style.display = 'flex'; };
+        window.closeSettings = function() { document.getElementById('settings-page').style.display = 'none'; };
 
-        window.updateFontColor = function(color) {
-            document.getElementById('chat-box').style.color = color;
+        window.toggleAttachmentDrawer = function() {
+            const drawer = document.getElementById('attachment-drawer');
+            drawer.style.display = drawer.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('emoji-picker').style.display = 'none';
         };
 
-        window.updateWallpaper = function(e) {
+        window.toggleEmojiPicker = function() {
+            const picker = document.getElementById('emoji-picker');
+            picker.style.display = picker.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('attachment-drawer').style.display = 'none';
+        };
+
+        window.addEmoji = function(emoji) {
+            const input = document.getElementById('message-input');
+            input.value += emoji;
+        };
+
+        window.triggerFileInput = function() {
+            document.getElementById('hidden-file-input').click();
+            document.getElementById('attachment-drawer').style.display = 'none';
+        };
+
+        window.handleImageSend = function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(evt) {
-                    document.getElementById('chat-room').style.backgroundImage = `url('${evt.target.result}')`;
+                reader.onload = async function(evt) {
+                    const imgHtml = `<img src="${evt.target.result}" style="max-width: 100%; border-radius: 8px;">`;
+                    const messagesRef = ref(db, 'messages');
+                    await push(messagesRef, {
+                        sender: myRole,
+                        text: imgHtml,
+                        timestamp: Date.now()
+                    });
                 };
                 reader.readAsDataURL(file);
             }
+        };
+
+        window.openCamera = async function() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('camera-feed').srcObject = cameraStream;
+                document.getElementById('camera-screen').style.display = 'flex';
+            } catch (e) { alert('Camera access denied or unavailable.'); }
+        };
+
+        window.closeCamera = function() {
+            if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+            document.getElementById('camera-screen').style.display = 'none';
+        };
+
+        window.capturePhoto = function() {
+            alert("Photo captured!");
+            closeCamera();
         };
 
         window.startCall = async function(videoEnabled) {
@@ -662,9 +942,9 @@
 
                     const lastMsg = msgArray[msgArray.length - 1];
                     if (lastMsg) {
-                        document.getElementById('last-msg-preview').textContent = lastMsg.text;
+                        document.getElementById('last-msg-preview').innerHTML = lastMsg.text.startsWith('<img') ? '📷 Photo' : lastMsg.text;
                         if (lastMsg.timestamp) {
-                            document.getElementById('last-time').textContent = new Date(lastMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            document.getElementById('last-time').textContent = new Date(lastMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
                         }
                     }
                     chatBox.scrollTop = chatBox.scrollHeight;
@@ -678,6 +958,7 @@
             if (!text) return;
 
             input.value = '';
+            document.getElementById('emoji-picker').style.display = 'none';
             const messagesRef = ref(db, 'messages');
             await push(messagesRef, {
                 sender: myRole,
