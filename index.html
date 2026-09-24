@@ -580,7 +580,7 @@
                     <button class="back-btn" onclick="closeChatRoom()">←</button>
                     <img src="twoofus.png" class="avatar" style="width: 36px; height: 36px;" alt="avatar" onclick="openContactInfo()">
                     <div class="user-title" onclick="openContactInfo()">
-                        <span>Nathasha🤍</span>
+                        <span id="chat-partner-title">Nathasha🤍</span>
                         <span class="user-status">online</span>
                     </div>
                     <button onclick="startCall(false)">📞</button>
@@ -680,8 +680,8 @@
                 </div>
                 <div class="profile-card">
                     <img src="twoofus.png" alt="Profile">
-                    <h2>Nathasha🤍</h2>
-                    <p style="color: #8696a0; font-size: 14px; margin-top: 4px;">+94 71 234 5678</p>
+                    <h2 id="contact-card-name">Nathasha🤍</h2>
+                    <p style="color: #8696a0; font-size: 14px; margin-top: 4px;">Connected Partner</p>
                     
                     <div class="action-bar">
                         <div class="action-box" onclick="closeContactInfo(); startCall(false);">
@@ -753,7 +753,7 @@
                 <div class="settings-profile">
                     <img src="twoofus.png" class="avatar" style="width: 60px; height: 60px;">
                     <div>
-                        <div style="font-size: 18px; font-weight: bold;">Tevi</div>
+                        <div id="settings-user-name" style="font-size: 18px; font-weight: bold;">User</div>
                         <div style="font-size: 13px; color: #8696a0;">Hey there! I am using WhatsApp.</div>
                     </div>
                 </div>
@@ -896,6 +896,14 @@
         function initApp() {
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'flex';
+
+            const partnerName = myRole === 'boy' ? 'Nathasha🤍' : 'Tevi🤍';
+            const myName = myRole === 'boy' ? 'Tevi' : 'Nathasha';
+
+            document.getElementById('partner-name').textContent = partnerName;
+            document.getElementById('chat-partner-title').textContent = partnerName;
+            document.getElementById('contact-card-name').textContent = partnerName;
+            document.getElementById('settings-user-name').textContent = myName;
 
             const myPeerId = myRole === 'boy' ? 'love-app-boy' : 'love-app-girl';
             peer = new Peer(myPeerId);
@@ -1045,7 +1053,7 @@
                 navigator.share({ title: 'WhatsApp App', text: inviteText, url: shareUrl });
             } else {
                 navigator.clipboard.writeText(inviteText);
-                alert('Invite APK link copied to clipboard!\nShare it with your phone contacts.');
+                alert('Invite link copied to clipboard!\nShare it with your phone contacts.');
             }
         };
 
@@ -1076,13 +1084,14 @@
                 const data = snapshot.val();
                 if (data) {
                     Object.values(data).forEach(status => {
+                        const partnerName = myRole === 'boy' ? 'Nathasha🤍' : 'Tevi🤍';
                         const item = document.createElement('div');
                         item.className = 'chat-item';
                         item.style.padding = '8px 0';
                         item.innerHTML = `
                             <img src="twoofus.png" class="avatar" style="border: 2px solid #25d366;">
                             <div class="chat-info">
-                                <div class="chat-name">${status.sender === myRole ? 'My Status' : 'Nathasha🤍'}</div>
+                                <div class="chat-name">${status.sender === myRole ? 'My Status' : partnerName}</div>
                                 <div class="chat-last-msg">${new Date(status.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
                             </div>
                         `;
@@ -1122,7 +1131,18 @@
         };
 
         window.capturePhoto = function() {
-            alert("Photo captured!");
+            const video = document.getElementById('camera-feed');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const imgUrl = canvas.toDataURL('image/png');
+            
+            push(ref(db, 'messages'), {
+                sender: myRole,
+                text: `<img src="${imgUrl}" style="max-width: 100%; border-radius: 8px;">`,
+                timestamp: Date.now()
+            });
             closeCamera();
         };
 
