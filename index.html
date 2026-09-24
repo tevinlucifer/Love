@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WhatsApp</title>
     <!-- Web App Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -17,6 +17,7 @@
             background-color: #0b141a;
             color: #e9edef;
             overflow: hidden;
+            user-select: none;
         }
 
         .app-container {
@@ -304,7 +305,7 @@
         }
 
         .room-header .back-btn { background: none; border: none; color: #aebac1; font-size: 20px; cursor: pointer; }
-        .room-header .user-title { flex: 1; font-weight: bold; font-size: 16px; display: flex; flex-direction: column; }
+        .room-header .user-title { flex: 1; font-weight: bold; font-size: 16px; display: flex; flex-direction: column; cursor: pointer; }
         .room-header .user-status { font-size: 11px; color: #25d366; font-weight: normal; }
         .room-header button { background: none; border: none; color: #aebac1; font-size: 18px; cursor: pointer; margin-left: 8px; }
 
@@ -333,7 +334,7 @@
         .input-area { padding: 8px; background: #202c33; display: flex; gap: 8px; align-items: center; }
         .input-area button { background: none; border: none; font-size: 20px; color: #8696a0; cursor: pointer; }
         .input-area input { flex: 1; padding: 10px 14px; background: #2a3942; border: none; border-radius: 20px; outline: none; font-size: 14px; color: #fff; }
-        .send-btn { background: #25d366 !important; color: #111b21 !important; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .action-btn { background: #25d366 !important; color: #111b21 !important; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; }
 
         /* Attachment Drawer */
         #attachment-drawer {
@@ -391,6 +392,19 @@
         .camera-bottom { display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .shutter-btn { width: 70px; height: 70px; border-radius: 50%; border: 4px solid #fff; background: transparent; cursor: pointer; }
         .camera-modes { display: flex; gap: 20px; background: #111b21; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+
+        /* Contact Info View Screen */
+        #contact-info-page { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #0b141a; z-index: 35; flex-direction: column; overflow-y: auto; }
+        .info-header { background: #202c33; padding: 16px; display: flex; align-items: center; gap: 15px; font-size: 18px; font-weight: bold; position: sticky; top: 0; z-index: 2; }
+        .info-header button { background: none; border: none; color: #aebac1; font-size: 20px; cursor: pointer; }
+        .profile-card { display: flex; flex-direction: column; align-items: center; padding: 25px 16px; background: #111b21; border-bottom: 8px solid #0b141a; }
+        .profile-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; }
+        .action-bar { display: flex; justify-content: space-around; width: 100%; margin-top: 15px; padding: 0 20px; }
+        .action-box { display: flex; flex-direction: column; align-items: center; gap: 6px; color: #25d366; font-size: 12px; cursor: pointer; }
+        .action-box .btn-icon { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #202c33; display: flex; justify-content: center; align-items: center; font-size: 18px; background: #1f2c34; }
+
+        /* Status Viewer Modal */
+        #status-viewer { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 60; flex-direction: column; justify-content: center; align-items: center; }
 
         /* Video Call Overlay */
         #video-container { display: none; background: #000; position: relative; height: 220px; width: 100%; }
@@ -472,7 +486,7 @@
                     <div class="pill">Unread</div>
                     <div class="pill">Favourites</div>
                     <div class="pill">Groups</div>
-                    <div class="pill">+</div>
+                    <div class="pill" onclick="syncPhoneContacts()">+ Sync Contacts</div>
                 </div>
             </div>
 
@@ -501,8 +515,20 @@
             <!-- Updates Tab -->
             <div id="tab-updates" class="tab-content">
                 <div style="padding: 16px;">
-                    <h3>Status Updates</h3>
-                    <p style="color: #8696a0; font-size: 14px; margin-top: 8px;">No recent status updates.</p>
+                    <h3 style="font-size: 18px; margin-bottom: 15px;">Status</h3>
+                    <div class="chat-item" style="padding: 0; margin-bottom: 20px;" onclick="triggerStatusUpload()">
+                        <div style="position: relative;">
+                            <img src="twoofus.png" class="avatar" style="border: 2px solid #25d366;">
+                            <span style="position: absolute; bottom: 0; right: 12px; background: #25d366; color: #111b21; border-radius: 50%; width: 18px; height: 18px; text-align: center; font-size: 14px; font-weight: bold;">+</span>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">My status</div>
+                            <div class="chat-last-msg">Tap to add status update</div>
+                        </div>
+                    </div>
+
+                    <h4 style="font-size: 13px; color: #8696a0; text-transform: uppercase; margin-bottom: 12px;">Recent updates</h4>
+                    <div id="status-feed"></div>
                 </div>
             </div>
 
@@ -524,8 +550,8 @@
 
             <!-- Floating Action Buttons -->
             <div class="fab-container">
-                <div class="fab fab-small">✨</div>
-                <div class="fab" onclick="openChatRoom()">+</div>
+                <div class="fab fab-small" onclick="generateInviteLink()">🔗</div>
+                <div class="fab" onclick="syncPhoneContacts()">+</div>
             </div>
 
             <!-- Bottom Navigation Bar -->
@@ -552,14 +578,14 @@
             <div id="chat-room">
                 <div class="room-header">
                     <button class="back-btn" onclick="closeChatRoom()">←</button>
-                    <img src="twoofus.png" class="avatar" style="width: 36px; height: 36px;" alt="avatar">
-                    <div class="user-title">
+                    <img src="twoofus.png" class="avatar" style="width: 36px; height: 36px;" alt="avatar" onclick="openContactInfo()">
+                    <div class="user-title" onclick="openContactInfo()">
                         <span>Nathasha🤍</span>
                         <span class="user-status">online</span>
                     </div>
                     <button onclick="startCall(false)">📞</button>
                     <button onclick="startCall(true)">📹</button>
-                    <button onclick="openSettings()">⋮</button>
+                    <button onclick="openContactInfo()">⋮</button>
                 </div>
 
                 <div id="video-container">
@@ -573,7 +599,7 @@
                 <!-- Attachment Drawer -->
                 <div id="attachment-drawer">
                     <div class="drawer-grid">
-                        <div class="drawer-item" onclick="triggerFileInput()">
+                        <div class="drawer-item" onclick="triggerFileInput('image/*')">
                             <div class="drawer-icon" style="background: #7f66ff;">🖼️</div>
                             <span>Gallery</span>
                         </div>
@@ -581,21 +607,21 @@
                             <div class="drawer-icon" style="background: #ff2e74;">📷</div>
                             <span>Camera</span>
                         </div>
-                        <div class="drawer-item">
+                        <div class="drawer-item" onclick="sendLocation()">
                             <div class="drawer-icon" style="background: #02a698;">📍</div>
                             <span>Location</span>
                         </div>
-                        <div class="drawer-item">
+                        <div class="drawer-item" onclick="syncPhoneContacts()">
                             <div class="drawer-icon" style="background: #00a884;">👤</div>
                             <span>Contact</span>
                         </div>
-                        <div class="drawer-item">
+                        <div class="drawer-item" onclick="triggerFileInput('*/*')">
                             <div class="drawer-icon" style="background: #5f66cd;">📄</div>
                             <span>Document</span>
                         </div>
-                        <div class="drawer-item">
-                            <div class="drawer-icon" style="background: #ffbc00;">📊</div>
-                            <span>Poll</span>
+                        <div class="drawer-item" onclick="generateInviteLink()">
+                            <div class="drawer-icon" style="background: #ffbc00;">🔗</div>
+                            <span>Invite App</span>
                         </div>
                         <div class="drawer-item">
                             <div class="drawer-icon" style="background: #e6457d;">📅</div>
@@ -634,14 +660,63 @@
                     </div>
                 </div>
 
-                <input type="file" id="hidden-file-input" style="display: none;" accept="image/*" onchange="handleImageSend(event)">
+                <input type="file" id="hidden-file-input" style="display: none;" onchange="handleFileSend(event)">
+                <input type="file" id="status-file-input" style="display: none;" accept="image/*,video/*" onchange="handleStatusUpload(event)">
 
                 <div class="input-area">
                     <button onclick="toggleEmojiPicker()">😊</button>
                     <button onclick="toggleAttachmentDrawer()">📎</button>
                     <button onclick="openCamera()">📷</button>
-                    <input type="text" id="message-input" placeholder="Message" onkeydown="if(event.key==='Enter') sendMessage()">
-                    <button class="send-btn" onclick="sendMessage()">➔</button>
+                    <input type="text" id="message-input" placeholder="Message" onkeydown="if(event.key==='Enter') sendMessage()" oninput="toggleInputButton()">
+                    <button class="action-btn" id="send-or-mic-btn" onclick="handleMicOrSend()">🎤</button>
+                </div>
+            </div>
+
+            <!-- Contact Info Screen -->
+            <div id="contact-info-page">
+                <div class="info-header">
+                    <button onclick="closeContactInfo()">←</button>
+                    <span>Contact Info</span>
+                </div>
+                <div class="profile-card">
+                    <img src="twoofus.png" alt="Profile">
+                    <h2>Nathasha🤍</h2>
+                    <p style="color: #8696a0; font-size: 14px; margin-top: 4px;">+94 71 234 5678</p>
+                    
+                    <div class="action-bar">
+                        <div class="action-box" onclick="closeContactInfo(); startCall(false);">
+                            <div class="btn-icon">📞</div>
+                            <span>Audio</span>
+                        </div>
+                        <div class="action-box" onclick="closeContactInfo(); startCall(true);">
+                            <div class="btn-icon">📹</div>
+                            <span>Video</span>
+                        </div>
+                        <div class="action-box" onclick="generateInviteLink()">
+                            <div class="btn-icon">🔗</div>
+                            <span>Invite</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 16px; border-bottom: 8px solid #0b141a;">
+                    <div style="font-size: 14px; color: #8696a0; margin-bottom: 6px;">Media, links, and docs</div>
+                    <div style="display: flex; gap: 8px; overflow-x: auto;">
+                        <img src="twoofus.png" style="width: 70px; height: 70px; border-radius: 8px; object-fit: cover;">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <span class="icon">🔔</span>
+                    <div><div class="title">Notifications</div><div class="subtitle">Mute, custom tones</div></div>
+                </div>
+                <div class="setting-item">
+                    <span class="icon">🖼️</span>
+                    <div><div class="title">Media visibility</div><div class="subtitle">Show downloaded media in phone gallery</div></div>
+                </div>
+                <div class="setting-item">
+                    <span class="icon">🔒</span>
+                    <div><div class="title">Encryption</div><div class="subtitle">Messages and calls are end-to-end encrypted</div></div>
                 </div>
             </div>
 
@@ -662,6 +737,11 @@
                     </div>
                     <button class="shutter-btn" onclick="capturePhoto()"></button>
                 </div>
+            </div>
+
+            <!-- Status Viewer Modal -->
+            <div id="status-viewer" onclick="closeStatusViewer()">
+                <div id="status-display-content" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;"></div>
             </div>
 
             <!-- Settings Page -->
@@ -728,6 +808,9 @@
         let currentCall = null;
         let localStream = null;
         let cameraStream = null;
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -831,10 +914,14 @@
             });
 
             listenForMessages();
+            listenForStatuses();
         }
 
         window.openChatRoom = function() { document.getElementById('chat-room').style.display = 'flex'; };
         window.closeChatRoom = function() { document.getElementById('chat-room').style.display = 'none'; };
+
+        window.openContactInfo = function() { document.getElementById('contact-info-page').style.display = 'flex'; };
+        window.closeContactInfo = function() { document.getElementById('contact-info-page').style.display = 'none'; };
 
         window.openSettings = function() { document.getElementById('settings-page').style.display = 'flex'; };
         window.closeSettings = function() { document.getElementById('settings-page').style.display = 'none'; };
@@ -854,28 +941,171 @@
         window.addEmoji = function(emoji) {
             const input = document.getElementById('message-input');
             input.value += emoji;
+            toggleInputButton();
         };
 
-        window.triggerFileInput = function() {
-            document.getElementById('hidden-file-input').click();
+        window.toggleInputButton = function() {
+            const val = document.getElementById('message-input').value.trim();
+            const btn = document.getElementById('send-or-mic-btn');
+            btn.innerHTML = val.length > 0 ? '➔' : '🎤';
+        };
+
+        /* Voice Notes Microphone Recording */
+        window.handleMicOrSend = function() {
+            const val = document.getElementById('message-input').value.trim();
+            if (val.length > 0) {
+                sendMessage();
+            } else {
+                toggleVoiceRecording();
+            }
+        };
+
+        async function toggleVoiceRecording() {
+            const btn = document.getElementById('send-or-mic-btn');
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const reader = new FileReader();
+                        reader.onload = async (evt) => {
+                            const audioHtml = `<audio controls src="${evt.target.result}" style="max-width: 200px;"></audio>`;
+                            await push(ref(db, 'messages'), { sender: myRole, text: audioHtml, timestamp: Date.now() });
+                        };
+                        reader.readAsDataURL(audioBlob);
+                    };
+                    mediaRecorder.start();
+                    isRecording = true;
+                    btn.style.background = '#f15c6d';
+                    btn.innerHTML = '⏹️';
+                } catch (e) { alert('Microphone permission required!'); }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                btn.style.background = '#25d366';
+                btn.innerHTML = '🎤';
+            }
+        }
+
+        /* Generic File Attachment Handler */
+        window.triggerFileInput = function(accept) {
+            const input = document.getElementById('hidden-file-input');
+            input.accept = accept;
+            input.click();
             document.getElementById('attachment-drawer').style.display = 'none';
         };
 
-        window.handleImageSend = function(e) {
+        window.handleFileSend = function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = async function(evt) {
-                    const imgHtml = `<img src="${evt.target.result}" style="max-width: 100%; border-radius: 8px;">`;
-                    const messagesRef = ref(db, 'messages');
-                    await push(messagesRef, {
-                        sender: myRole,
-                        text: imgHtml,
-                        timestamp: Date.now()
-                    });
+                    let contentHtml = '';
+                    if (file.type.startsWith('image/')) {
+                        contentHtml = `<img src="${evt.target.result}" style="max-width: 100%; border-radius: 8px;">`;
+                    } else {
+                        contentHtml = `📄 <a href="${evt.target.result}" download="${file.name}" style="color:#53bdeb;">${file.name}</a>`;
+                    }
+                    await push(ref(db, 'messages'), { sender: myRole, text: contentHtml, timestamp: Date.now() });
                 };
                 reader.readAsDataURL(file);
             }
+        };
+
+        window.sendLocation = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const locHtml = `📍 <a href="https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}" target="_blank" style="color:#53bdeb;">Shared Location</a>`;
+                    await push(ref(db, 'messages'), { sender: myRole, text: locHtml, timestamp: Date.now() });
+                    document.getElementById('attachment-drawer').style.display = 'none';
+                });
+            }
+        };
+
+        /* Contacts Sync & Invite Link */
+        window.syncPhoneContacts = async function() {
+            if ('contacts' in navigator && 'ContactsManager' in window) {
+                try {
+                    const props = ['name', 'tel'];
+                    const contacts = await navigator.contacts.select(props, { multiple: true });
+                    alert(`Synced ${contacts.length} phone contacts!`);
+                } catch (e) { generateInviteLink(); }
+            } else {
+                generateInviteLink();
+            }
+        };
+
+        window.generateInviteLink = function() {
+            const shareUrl = window.location.href;
+            const inviteText = `Hey! Join me on WhatsApp. Download or access the app here: ${shareUrl}`;
+            if (navigator.share) {
+                navigator.share({ title: 'WhatsApp App', text: inviteText, url: shareUrl });
+            } else {
+                navigator.clipboard.writeText(inviteText);
+                alert('Invite APK link copied to clipboard!\nShare it with your phone contacts.');
+            }
+        };
+
+        /* Statuses Handler */
+        window.triggerStatusUpload = function() { document.getElementById('status-file-input').click(); };
+
+        window.handleStatusUpload = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async function(evt) {
+                    await push(ref(db, 'statuses'), {
+                        sender: myRole,
+                        mediaUrl: evt.target.result,
+                        type: file.type.startsWith('video') ? 'video' : 'image',
+                        timestamp: Date.now()
+                    });
+                    alert('Status posted!');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        function listenForStatuses() {
+            onValue(ref(db, 'statuses'), (snapshot) => {
+                const feed = document.getElementById('status-feed');
+                feed.innerHTML = '';
+                const data = snapshot.val();
+                if (data) {
+                    Object.values(data).forEach(status => {
+                        const item = document.createElement('div');
+                        item.className = 'chat-item';
+                        item.style.padding = '8px 0';
+                        item.innerHTML = `
+                            <img src="twoofus.png" class="avatar" style="border: 2px solid #25d366;">
+                            <div class="chat-info">
+                                <div class="chat-name">${status.sender === myRole ? 'My Status' : 'Nathasha🤍'}</div>
+                                <div class="chat-last-msg">${new Date(status.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                            </div>
+                        `;
+                        item.onclick = () => showStatusViewer(status);
+                        feed.appendChild(item);
+                    });
+                }
+            });
+        }
+
+        function showStatusViewer(status) {
+            const viewer = document.getElementById('status-viewer');
+            const display = document.getElementById('status-display-content');
+            if (status.type === 'video') {
+                display.innerHTML = `<video src="${status.mediaUrl}" autoplay style="max-width:100%; max-height:80%;"></video>`;
+            } else {
+                display.innerHTML = `<img src="${status.mediaUrl}" style="max-width:100%; max-height:80%;">`;
+            }
+            viewer.style.display = 'flex';
+        }
+
+        window.closeStatusViewer = function() {
+            document.getElementById('status-viewer').style.display = 'none';
         };
 
         window.openCamera = async function() {
@@ -944,7 +1174,7 @@
 
                     const lastMsg = msgArray[msgArray.length - 1];
                     if (lastMsg) {
-                        document.getElementById('last-msg-preview').innerHTML = lastMsg.text.startsWith('<img') ? '📷 Photo' : lastMsg.text;
+                        document.getElementById('last-msg-preview').innerHTML = lastMsg.text.startsWith('<img') ? '📷 Photo' : (lastMsg.text.startsWith('<audio') ? '🎤 Voice note' : lastMsg.text);
                         if (lastMsg.timestamp) {
                             document.getElementById('last-time').textContent = new Date(lastMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
                         }
@@ -960,6 +1190,7 @@
             if (!text) return;
 
             input.value = '';
+            toggleInputButton();
             document.getElementById('emoji-picker').style.display = 'none';
             const messagesRef = ref(db, 'messages');
             await push(messagesRef, {
