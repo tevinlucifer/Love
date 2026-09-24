@@ -166,14 +166,14 @@
 
                 <!-- Sign In Form -->
                 <div id="login-form">
-                    <input type="text" id="login-username" placeholder="Username">
+                    <input type="text" id="login-email" placeholder="Email">
                     <input type="password" id="login-password" placeholder="Password">
                     <button class="auth-btn" onclick="handleLogin()">Sign In</button>
                 </div>
 
                 <!-- Create Account Form -->
                 <div id="register-form" style="display: none;">
-                    <input type="text" id="reg-username" placeholder="Username">
+                    <input type="text" id="reg-email" placeholder="Email">
                     <select id="reg-role">
                         <option value="boy">Boy</option>
                         <option value="girl">Girl</option>
@@ -211,17 +211,46 @@
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK Modular Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, push, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJ4eGBufpJ5jpV6yoZ91CiO40JOGeu1to",
+            authDomain: "love-chat-7a40d.firebaseapp.com",
+            projectId: "love-chat-7a40d",
+            storageBucket: "love-chat-7a40d.firebasestorage.app",
+            messagingSenderId: "940509187617",
+            appId: "1:940509187617:web:c00bed772ef498be4c1d60",
+            measurementId: "G-Q5L1Q6B3GD"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
         let myRole = localStorage.getItem('user_role');
         let peer = null;
         let currentCall = null;
         let localStream = null;
 
-        if (myRole) {
-            initApp();
-        }
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const snapshot = await get(child(ref(db), `users/${user.uid}`));
+                if (snapshot.exists()) {
+                    myRole = snapshot.val().role;
+                    localStorage.setItem('user_role', myRole);
+                    initApp();
+                }
+            } else {
+                document.getElementById('auth-screen').style.display = 'flex';
+                document.getElementById('chat-screen').style.display = 'none';
+            }
+        });
 
-        function switchTab(tab) {
+        window.switchTab = function(tab) {
             showError('');
             if (tab === 'login') {
                 document.getElementById('tab-login').classList.add('active');
@@ -234,7 +263,7 @@
                 document.getElementById('register-form').style.display = 'block';
                 document.getElementById('login-form').style.display = 'none';
             }
-        }
+        };
 
         function showError(msg) {
             const errBox = document.getElementById('error-box');
@@ -246,13 +275,13 @@
             }
         }
 
-        async function handleRegister() {
-            const username = document.getElementById('reg-username').value.trim();
+        window.handleRegister = async function() {
+            const email = document.getElementById('reg-email').value.trim();
             const role = document.getElementById('reg-role').value;
             const password = document.getElementById('reg-password').value;
             const confirmPassword = document.getElementById('reg-confirm-password').value;
 
-            if (!username || !password) {
+            if (!email || !password) {
                 showError('Please fill in all fields.');
                 return;
             }
@@ -262,51 +291,39 @@
                 return;
             }
 
-            const res = await fetch('/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, role, password })
-            });
-
-            const data = await res.json();
-            if (data.status === 'success') {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                await set(ref(db, 'users/' + user.uid), { role, email });
                 localStorage.setItem('user_role', role);
                 myRole = role;
-                initApp();
-            } else {
-                showError(data.message || 'Registration failed');
+            } catch (error) {
+                showError(error.message);
             }
-        }
+        };
 
-        async function handleLogin() {
-            const username = document.getElementById('login-username').value.trim();
+        window.handleLogin = async function() {
+            const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
 
-            if (!username || !password) {
-                showError('Please enter username and password.');
+            if (!email || !password) {
+                showError('Please enter email and password.');
                 return;
             }
 
-            const res = await fetch('/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-
-            const data = await res.json();
-            if (data.status === 'success') {
-                localStorage.setItem('user_role', data.role);
-                myRole = data.role;
-                initApp();
-            } else {
-                showError(data.message || 'Password incorrect, try again');
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                showError('Login failed: ' + error.message);
             }
-        }
+        };
 
-        function logout() {
-            localStorage.removeItem('user_role');
-            location.reload();
-        }
+        window.logout = function() {
+            signOut(auth).then(() => {
+                localStorage.removeItem('user_role');
+                location.reload();
+            });
+        };
 
         function initApp() {
             document.getElementById('auth-screen').style.display = 'none';
@@ -328,11 +345,10 @@
                 }
             });
 
-            setInterval(fetchMessages, 2000);
-            fetchMessages();
+            listenForMessages();
         }
 
-        async function startCall(videoEnabled) {
+        window.startCall = async function(videoEnabled) {
             const targetPeerId = myRole === 'boy' ? 'love-app-girl' : 'love-app-boy';
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: videoEnabled, audio: true });
@@ -345,7 +361,7 @@
             } catch (err) {
                 alert("Microphone/Camera permission required!");
             }
-        }
+        };
 
         function setupVideoUI(videoEnabled, stream) {
             document.getElementById('video-container').style.display = 'block';
@@ -353,42 +369,44 @@
             document.getElementById('local-video').srcObject = stream;
         }
 
-        function endCall() {
+        window.endCall = function() {
             if (currentCall) currentCall.close();
             if (localStream) localStream.getTracks().forEach(track => track.stop());
             document.getElementById('video-container').style.display = 'none';
-        }
+        };
 
         const chatBox = document.getElementById('chat-box');
 
-        async function fetchMessages() {
-            try {
-                const res = await fetch('/messages');
-                const data = await res.json();
+        function listenForMessages() {
+            const messagesRef = ref(db, 'messages');
+            onValue(messagesRef, (snapshot) => {
                 chatBox.innerHTML = '';
-                data.forEach(msg => {
-                    const div = document.createElement('div');
-                    div.className = `message ${msg.sender === myRole ? 'sent' : 'received'}`;
-                    div.textContent = msg.text;
-                    chatBox.appendChild(div);
-                });
-                chatBox.scrollTop = chatBox.scrollHeight;
-            } catch (e) {}
+                const data = snapshot.val();
+                if (data) {
+                    Object.values(data).forEach(msg => {
+                        const div = document.createElement('div');
+                        div.className = `message ${msg.sender === myRole ? 'sent' : 'received'}`;
+                        div.textContent = msg.text;
+                        chatBox.appendChild(div);
+                    });
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            });
         }
 
-        async function sendMessage() {
+        window.sendMessage = async function() {
             const input = document.getElementById('message-input');
             const text = input.value.trim();
             if (!text) return;
 
             input.value = '';
-            await fetch('/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sender: myRole, text })
+            const messagesRef = ref(db, 'messages');
+            await push(messagesRef, {
+                sender: myRole,
+                text: text,
+                timestamp: Date.now()
             });
-            fetchMessages();
-        }
+        };
     </script>
 </body>
 </html>
