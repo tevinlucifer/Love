@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 let messages = [
-    { sender: 'girl', text: 'Hey ❤️ Welcome to our app!' }
+    { sender: 'girl', text: 'Hey ❤️ Welcome to our WhatsApp app!' }
 ];
 
 // In-memory user store

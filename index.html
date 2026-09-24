@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Us Only 💕</title>
+    <title>WhatsApp 💕</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body, html { 
             height: 100%; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #121212;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b141a;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            color: #333;
+            color: #e9edef;
         }
 
         .app-container {
@@ -25,17 +25,17 @@
             max-width: 430px;
             max-height: 850px;
             position: relative;
-            background: #005c4b;
+            background: #111b21;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
 
         @media (min-width: 481px) {
             .app-container {
-                border-radius: 32px;
-                border: 8px solid #2d2d2d;
+                border-radius: 28px;
+                border: 8px solid #222d34;
             }
         }
 
@@ -43,7 +43,7 @@
         #auth-screen {
             height: 100%;
             width: 100%;
-            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('hands.png') center/cover no-repeat;
+            background: linear-gradient(rgba(11,20,26,0.7), rgba(11,20,26,0.7)), url('hands.png') center/cover no-repeat;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -51,53 +51,53 @@
         }
 
         .auth-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: #1f2c34;
             padding: 25px 20px;
-            border-radius: 20px;
+            border-radius: 16px;
             width: 88%;
             max-width: 340px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid #2a3942;
         }
 
-        .auth-card h2 { color: #008069; margin-bottom: 15px; font-size: 22px; }
+        .auth-card h2 { color: #00a884; margin-bottom: 15px; font-size: 22px; }
 
         .tab-buttons {
             display: flex;
             margin-bottom: 15px;
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
-            border: 1px solid #008069;
+            border: 1px solid #00a884;
         }
 
         .tab-btn {
             flex: 1;
             padding: 8px;
-            background: #fff;
+            background: #1f2c34;
             border: none;
             cursor: pointer;
             font-weight: bold;
-            color: #008069;
+            color: #00a884;
         }
 
         .tab-btn.active {
-            background: #008069;
+            background: #00a884;
             color: #fff;
         }
 
         .auth-card select, .auth-card input {
             width: 100%; padding: 10px 12px; margin-bottom: 10px;
-            border: 1px solid #ccc; border-radius: 10px; outline: none; font-size: 14px;
+            background: #111b21; border: 1px solid #2a3942; border-radius: 8px; outline: none; font-size: 14px; color: #fff;
         }
 
         .auth-btn {
-            width: 100%; padding: 12px; background: #008069; color: white;
-            border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer;
+            width: 100%; padding: 12px; background: #00a884; color: white;
+            border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer;
         }
 
         .error-msg {
-            color: #d90429; font-size: 13px; margin-bottom: 10px; display: none; font-weight: bold;
+            color: #f15c6d; font-size: 13px; margin-bottom: 10px; display: none; font-weight: bold;
         }
 
         /* Main View Container */
@@ -106,14 +106,14 @@
             width: 100%;
             display: none;
             flex-direction: column;
-            background: #fff;
+            background: #111b21;
         }
 
-        /* Top WhatsApp Header */
+        /* Header */
         .wa-header {
-            background: #008069;
-            color: white;
-            padding: 12px 16px 4px 16px;
+            background: #202c33;
+            color: #e9edef;
+            padding: 12px 16px 0 16px;
             display: flex;
             flex-direction: column;
         }
@@ -127,12 +127,14 @@
             margin-bottom: 12px;
         }
 
+        .wa-header-top span { color: #00a884; font-size: 22px; }
+
         .wa-header-icons button {
             background: transparent;
             border: none;
-            color: white;
+            color: #aebac1;
             font-size: 18px;
-            margin-left: 14px;
+            margin-left: 16px;
             cursor: pointer;
         }
 
@@ -143,37 +145,35 @@
             text-align: center;
             font-size: 14px;
             font-weight: bold;
-            color: rgba(255, 255, 255, 0.7);
+            color: #8696a0;
         }
 
         .wa-tab {
-            padding-bottom: 8px;
+            padding-bottom: 10px;
             flex: 1;
             cursor: pointer;
             text-align: center;
         }
 
         .wa-tab.active {
-            color: #fff;
-            border-bottom: 3px solid #fff;
+            color: #00a884;
+            border-bottom: 3px solid #00a884;
         }
+
+        /* Tab Panels */
+        .tab-content { display: none; flex: 1; overflow-y: auto; background: #111b21; }
+        .tab-content.active { display: block; }
 
         /* Chat Panel (List View) */
-        #chat-panel {
-            flex: 1;
-            background: #fff;
-            overflow-y: auto;
-        }
-
         .chat-item {
             display: flex;
             align-items: center;
             padding: 12px 16px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #222d34;
             cursor: pointer;
         }
 
-        .chat-item:hover { background: #f5f5f5; }
+        .chat-item:hover { background: #202c33; }
 
         .avatar {
             width: 48px;
@@ -181,42 +181,53 @@
             border-radius: 50%;
             margin-right: 14px;
             object-fit: cover;
-            background: #ccc;
+            background: #6c757d;
         }
 
         .chat-info { flex: 1; }
-        .chat-name { font-weight: bold; font-size: 16px; color: #111; display: flex; justify-content: space-between; }
-        .chat-time { font-size: 12px; color: #888; font-weight: normal; }
-        .chat-last-msg { font-size: 13px; color: #666; margin-top: 4px; display: flex; justify-content: space-between; }
-        .unread-badge { background: #25d366; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold; }
+        .chat-name { font-weight: bold; font-size: 16px; color: #e9edef; display: flex; justify-content: space-between; }
+        .chat-time { font-size: 12px; color: #8696a0; font-weight: normal; }
+        .chat-last-msg { font-size: 13px; color: #8696a0; margin-top: 4px; display: flex; justify-content: space-between; }
+        .unread-badge { background: #00a884; color: #111b21; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold; }
 
-        /* Individual Active Chat Room Screen */
+        /* Status & Calls Empty Views */
+        .status-item, .call-item {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #222d34;
+        }
+
+        /* Individual Chat Room Screen */
         #chat-room {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('twoofus.png') center/cover no-repeat;
+            background: #0b141a url('twoofus.png') center/cover no-repeat;
             display: none;
             flex-direction: column;
             z-index: 10;
         }
 
         .room-header {
-            background: #008069;
-            color: white;
-            padding: 10px;
+            background: #202c33;
+            color: #e9edef;
+            padding: 10px 14px;
             display: flex;
             align-items: center;
             gap: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
         .room-header .back-btn {
-            background: none; border: none; color: white; font-size: 20px; cursor: pointer;
+            background: none; border: none; color: #aebac1; font-size: 20px; cursor: pointer;
         }
 
-        .room-header .user-title { flex: 1; font-weight: bold; font-size: 16px; }
+        .room-header .user-title { flex: 1; font-weight: bold; font-size: 16px; display: flex; flex-direction: column; }
+        .room-header .user-status { font-size: 11px; color: #00a884; font-weight: normal; }
 
         .room-header button {
-            background: none; border: none; color: white; font-size: 18px; cursor: pointer; margin-left: 8px;
+            background: none; border: none; color: #aebac1; font-size: 18px; cursor: pointer; margin-left: 8px;
         }
 
         #chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
@@ -225,43 +236,59 @@
         .message {
             max-width: 75%;
             padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 15px;
+            border-radius: 8px;
+            font-size: 14px;
             word-wrap: break-word;
             line-height: 1.4;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
         .sent {
-            background: #d9fdd3;
-            color: #111;
+            background: #005c4b;
+            color: #e9edef;
             align-self: flex-end;
-            border-top-right-radius: 2px;
+            border-top-right-radius: 0;
         }
 
         .received {
-            background: #ffffff;
-            color: #111;
+            background: #202c33;
+            color: #e9edef;
             align-self: flex-start;
-            border-top-left-radius: 2px;
+            border-top-left-radius: 0;
         }
 
-        .input-area { padding: 8px; background: #f0f0f0; display: flex; gap: 8px; align-items: center; }
-        .input-area input { flex: 1; padding: 10px 14px; border: none; border-radius: 20px; outline: none; font-size: 15px; }
-        .send-btn { background: #008069; color: white; border: none; padding: 10px 16px; border-radius: 50%; font-weight: bold; cursor: pointer; }
+        .msg-meta {
+            font-size: 10px;
+            color: #8696a0;
+            float: right;
+            margin-left: 10px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
 
-        /* Video / Call Screen Container */
+        .ticks { color: #53bdeb; font-weight: bold; }
+
+        /* Message Input Bar */
+        .input-area { padding: 8px; background: #202c33; display: flex; gap: 8px; align-items: center; }
+        .input-area button { background: none; border: none; font-size: 20px; color: #8696a0; cursor: pointer; }
+        .input-area input { flex: 1; padding: 10px 14px; background: #2a3942; border: none; border-radius: 20px; outline: none; font-size: 14px; color: #fff; }
+        .send-btn { background: #00a884 !important; color: #111b21 !important; border: none; padding: 8px 12px; border-radius: 50%; cursor: pointer; }
+
+        /* Video Call Overlay */
         #video-container { display: none; background: #000; position: relative; height: 220px; width: 100%; }
         video { width: 100%; height: 100%; object-fit: cover; }
         #local-video { width: 80px; height: 110px; position: absolute; bottom: 10px; right: 10px; border: 2px solid white; border-radius: 8px; z-index: 10; }
-        .end-call-btn { position: absolute; top: 10px; right: 10px; background: #ff3333; color: white; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; z-index: 11; font-weight: bold; }
+        .end-call-btn { position: absolute; top: 10px; right: 10px; background: #f15c6d; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; z-index: 11; font-weight: bold; }
 
-        /* Settings Modal Overlay */
+        /* Settings Drawer Overlay */
         #settings-modal {
             display: none;
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(4px);
             z-index: 30;
             justify-content: center;
@@ -269,20 +296,21 @@
         }
 
         .settings-card {
-            background: #fff;
+            background: #1f2c34;
             width: 85%;
             max-width: 340px;
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid #2a3942;
         }
 
-        .settings-card h3 { margin-bottom: 15px; color: #008069; }
+        .settings-card h3 { margin-bottom: 15px; color: #00a884; }
         .setting-row { margin-bottom: 12px; text-align: left; }
-        .setting-row label { display: block; font-size: 13px; color: #666; margin-bottom: 4px; font-weight: bold; }
-        .setting-row select, .setting-row input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; }
-        .close-settings { width: 100%; padding: 10px; background: #008069; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        .logout-btn-settings { width: 100%; padding: 10px; background: #d90429; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 8px; cursor: pointer; }
+        .setting-row label { display: block; font-size: 13px; color: #8696a0; margin-bottom: 4px; font-weight: bold; }
+        .setting-row select, .setting-row input { width: 100%; padding: 8px; background: #111b21; border: 1px solid #2a3942; border-radius: 8px; color: #fff; }
+        .close-settings { width: 100%; padding: 10px; background: #00a884; color: #111b21; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .logout-btn-settings { width: 100%; padding: 10px; background: #f15c6d; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -291,7 +319,7 @@
         <!-- Auth / Login View -->
         <div id="auth-screen">
             <div class="auth-card">
-                <h2>Welcome 💕</h2>
+                <h2>WhatsApp 💕</h2>
 
                 <div class="tab-buttons">
                     <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
@@ -321,25 +349,26 @@
             </div>
         </div>
 
-        <!-- Main WhatsApp-Style View -->
+        <!-- Main WhatsApp Interface View -->
         <div id="main-app">
             <div class="wa-header">
                 <div class="wa-header-top">
                     <span>WhatsApp</span>
                     <div class="wa-header-icons">
+                        <button>📷</button>
                         <button>🔍</button>
-                        <button onclick="openSettings()">⚙️</button>
+                        <button onclick="openSettings()">⋮</button>
                     </div>
                 </div>
                 <div class="wa-tabs">
-                    <div class="wa-tab active">Chats</div>
-                    <div class="wa-tab">Status</div>
-                    <div class="wa-tab">Calls</div>
+                    <div class="wa-tab active" onclick="switchWaTab('chats')">Chats</div>
+                    <div class="wa-tab" onclick="switchWaTab('status')">Status</div>
+                    <div class="wa-tab" onclick="switchWaTab('calls')">Calls</div>
                 </div>
             </div>
 
-            <!-- Chat Panel List -->
-            <div id="chat-panel">
+            <!-- Chats Tab Panel -->
+            <div id="tab-chats" class="tab-content active">
                 <div class="chat-item" onclick="openChatRoom()">
                     <img src="twoofus.png" class="avatar" alt="avatar">
                     <div class="chat-info">
@@ -348,21 +377,47 @@
                             <span class="chat-time" id="last-time">12:00 PM</span>
                         </div>
                         <div class="chat-last-msg">
-                            <span id="last-msg-preview">Tap to start messaging...</span>
+                            <span id="last-msg-preview">Tap to open conversation...</span>
                             <span class="unread-badge">1</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Individual Chat Room View -->
+            <!-- Status Tab Panel -->
+            <div id="tab-status" class="tab-content">
+                <div class="status-item">
+                    <img src="twoofus.png" class="avatar" style="border: 2px solid #00a884;" alt="My Status">
+                    <div>
+                        <div style="font-weight: bold;">My Status</div>
+                        <div style="font-size: 12px; color: #8696a0;">Tap to add status update</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calls Tab Panel -->
+            <div id="tab-calls" class="tab-content">
+                <div class="call-item">
+                    <div style="font-size: 24px;">📞</div>
+                    <div>
+                        <div style="font-weight: bold;">Recent Calls</div>
+                        <div style="font-size: 12px; color: #8696a0;">No recent calls made</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Chat Room Screen -->
             <div id="chat-room">
                 <div class="room-header">
                     <button class="back-btn" onclick="closeChatRoom()">←</button>
-                    <span class="user-title" id="chat-header-title">My Partner ❤️</span>
+                    <img src="twoofus.png" class="avatar" style="width: 36px; height: 36px;" alt="avatar">
+                    <div class="user-title">
+                        <span>My Partner ❤️</span>
+                        <span class="user-status">online</span>
+                    </div>
                     <button onclick="startCall(false)">📞</button>
                     <button onclick="startCall(true)">📹</button>
-                    <button onclick="openSettings()">⚙️</button>
+                    <button onclick="openSettings()">⋮</button>
                 </div>
 
                 <div id="video-container">
@@ -374,7 +429,9 @@
                 <div id="chat-box"></div>
 
                 <div class="input-area">
-                    <input type="text" id="message-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage()">
+                    <button>😊</button>
+                    <button>📎</button>
+                    <input type="text" id="message-input" placeholder="Message" onkeydown="if(event.key==='Enter') sendMessage()">
                     <button class="send-btn" onclick="sendMessage()">➔</button>
                 </div>
             </div>
@@ -383,11 +440,11 @@
         <!-- Settings Modal -->
         <div id="settings-modal">
             <div class="settings-card">
-                <h3>App Settings</h3>
+                <h3>Settings</h3>
 
                 <div class="setting-row">
                     <label>Font Color</label>
-                    <input type="color" id="setting-color" value="#111111" onchange="updateFontColor(this.value)">
+                    <input type="color" id="setting-color" value="#e9edef" onchange="updateFontColor(this.value)">
                 </div>
 
                 <div class="setting-row">
@@ -396,10 +453,10 @@
                 </div>
 
                 <div class="setting-row">
-                    <label>Ringtone Sound</label>
+                    <label>Notification Ringtone</label>
                     <select id="setting-ringtone">
-                        <option value="default.mp3">Classic Bell</option>
-                        <option value="romantic.mp3">Chime</option>
+                        <option value="default.mp3">WhatsApp Tone</option>
+                        <option value="romantic.mp3">Chime Tone</option>
                         <option value="silent">Silent</option>
                     </select>
                 </div>
@@ -410,7 +467,7 @@
         </div>
     </div>
 
-    <!-- Firebase SDK Modular Scripts -->
+    <!-- Firebase Modular Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -463,6 +520,14 @@
                 document.getElementById('register-form').style.display = 'block';
                 document.getElementById('login-form').style.display = 'none';
             }
+        };
+
+        window.switchWaTab = function(tabName) {
+            document.querySelectorAll('.wa-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
         };
 
         function showError(msg) {
@@ -590,16 +655,22 @@
                     const msgArray = Object.values(data);
                     msgArray.forEach(msg => {
                         const div = document.createElement('div');
-                        // Crucial Left / Right Logic:
                         const isSentByMe = msg.sender === myRole;
                         div.className = `message ${isSentByMe ? 'sent' : 'received'}`;
-                        div.textContent = msg.text;
+                        
+                        const timeString = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                        const ticks = isSentByMe ? `<span class="ticks">✓✓</span>` : '';
+
+                        div.innerHTML = `${msg.text} <div class="msg-meta">${timeString} ${ticks}</div>`;
                         chatBox.appendChild(div);
                     });
 
                     const lastMsg = msgArray[msgArray.length - 1];
                     if (lastMsg) {
                         document.getElementById('last-msg-preview').textContent = lastMsg.text;
+                        if (lastMsg.timestamp) {
+                            document.getElementById('last-time').textContent = new Date(lastMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        }
                     }
                     chatBox.scrollTop = chatBox.scrollHeight;
                 }
