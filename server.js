@@ -6,8 +6,19 @@ let messages = [
     { sender: 'girl', text: 'Hey ❤️ Welcome to our app!' }
 ];
 
-// In-memory user database
+// In-memory user store
 let users = {}; 
+
+const MIME_TYPES = {
+    '.html': 'text/html',
+    '.css': 'text/css',
+    '.js': 'text/javascript',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.mp3': 'audio/mpeg',
+    '.wav': 'audio/wav'
+};
 
 const server = http.createServer((req, res) => {
     const reqUrl = decodeURIComponent(req.url);
@@ -17,19 +28,19 @@ const server = http.createServer((req, res) => {
             if (err) { res.writeHead(500); res.end('Server Error'); }
             else { res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(content); }
         });
-    } else if (req.method === 'GET' && (reqUrl.endsWith('.jpg') || reqUrl.endsWith('.jpeg'))) {
-        const filePath = path.join(__dirname, reqUrl);
-        fs.readFile(filePath, (err, content) => {
-            if (err) { res.writeHead(404); res.end('Image Not Found'); }
-            else { res.writeHead(200, { 'Content-Type': 'image/jpeg' }); res.end(content); }
-        });
-    } else if (req.method === 'GET' && reqUrl.endsWith('.png')) {
-        const filePath = path.join(__dirname, reqUrl);
-        fs.readFile(filePath, (err, content) => {
-            if (err) { res.writeHead(404); res.end('Image Not Found'); }
-            else { res.writeHead(200, { 'Content-Type': 'image/png' }); res.end(content); }
-        });
-    } else if (req.method === 'POST' && reqUrl === '/register') {
+    } else if (req.method === 'GET') {
+        const ext = path.extname(reqUrl);
+        if (MIME_TYPES[ext]) {
+            const filePath = path.join(__dirname, reqUrl);
+            fs.readFile(filePath, (err, content) => {
+                if (err) { res.writeHead(404); res.end('File Not Found'); }
+                else { res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] }); res.end(content); }
+            });
+            return;
+        }
+    }
+
+    if (req.method === 'POST' && reqUrl === '/register') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
         req.on('end', () => {

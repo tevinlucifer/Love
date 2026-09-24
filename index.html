@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Us Only ❤️</title>
+    <title>Us Only 💕</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -11,54 +11,47 @@
         body, html { 
             height: 100%; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #1a1a1a;
+            background-color: #121212;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            color: #333;
         }
 
-        /* Mobile Container Frame for Desktop */
         .app-container {
             width: 100%;
             height: 100%;
             max-width: 430px;
             max-height: 850px;
             position: relative;
-            background: #fff;
+            background: #005c4b;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
-        @media (max-width: 480px) {
-            .app-container {
-                max-width: 100%;
-                max-height: 100%;
-                border-radius: 0;
-            }
-        }
-
         @media (min-width: 481px) {
             .app-container {
-                border-radius: 36px;
+                border-radius: 32px;
                 border: 8px solid #2d2d2d;
             }
         }
 
-        /* Auth Screen with hands.png background */
+        /* Auth Screen */
         #auth-screen {
             height: 100%;
             width: 100%;
-            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('hands.png') center/cover no-repeat;
+            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('hands.png') center/cover no-repeat;
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 20;
         }
 
         .auth-card {
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 25px 20px;
             border-radius: 20px;
@@ -68,14 +61,14 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.25);
         }
 
-        .auth-card h2 { color: #ff4d6d; margin-bottom: 15px; font-size: 22px; }
+        .auth-card h2 { color: #008069; margin-bottom: 15px; font-size: 22px; }
 
         .tab-buttons {
             display: flex;
             margin-bottom: 15px;
             border-radius: 10px;
             overflow: hidden;
-            border: 1px solid #ffccd5;
+            border: 1px solid #008069;
         }
 
         .tab-btn {
@@ -85,68 +78,211 @@
             border: none;
             cursor: pointer;
             font-weight: bold;
-            color: #ff4d6d;
+            color: #008069;
         }
 
         .tab-btn.active {
-            background: #ff4d6d;
+            background: #008069;
             color: #fff;
         }
 
         .auth-card select, .auth-card input {
             width: 100%; padding: 10px 12px; margin-bottom: 10px;
-            border: 1px solid #ffccd5; border-radius: 10px; outline: none; font-size: 14px;
+            border: 1px solid #ccc; border-radius: 10px; outline: none; font-size: 14px;
         }
 
         .auth-btn {
-            width: 100%; padding: 12px; background: #ff4d6d; color: white;
+            width: 100%; padding: 12px; background: #008069; color: white;
             border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer;
-            margin-top: 5px;
         }
 
         .error-msg {
-            color: #d90429;
-            font-size: 13px;
-            margin-bottom: 10px;
-            display: none;
-            font-weight: bold;
+            color: #d90429; font-size: 13px; margin-bottom: 10px; display: none; font-weight: bold;
         }
 
-        /* Main Chat Screen with twoofus.png */
-        #chat-screen {
+        /* Main View Container */
+        #main-app {
             height: 100%;
             width: 100%;
             display: none;
             flex-direction: column;
-            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('twoofus.png') center/cover no-repeat;
+            background: #fff;
         }
 
-        .header {
-            background: rgba(255, 77, 109, 0.9);
-            backdrop-filter: blur(5px);
-            color: white; padding: 12px 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            font-weight: bold; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        /* Top WhatsApp Header */
+        .wa-header {
+            background: #008069;
+            color: white;
+            padding: 12px 16px 4px 16px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .header-actions button {
-            background: white; color: #ff4d6d; border: none;
-            padding: 6px 10px; border-radius: 15px; font-weight: bold; margin-left: 4px; cursor: pointer;
+        .wa-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 12px;
         }
 
+        .wa-header-icons button {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            margin-left: 14px;
+            cursor: pointer;
+        }
+
+        /* Tab Bar */
+        .wa-tabs {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .wa-tab {
+            padding-bottom: 8px;
+            flex: 1;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .wa-tab.active {
+            color: #fff;
+            border-bottom: 3px solid #fff;
+        }
+
+        /* Chat Panel (List View) */
+        #chat-panel {
+            flex: 1;
+            background: #fff;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+
+        .chat-item:hover { background: #f5f5f5; }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin-right: 14px;
+            object-fit: cover;
+            background: #ccc;
+        }
+
+        .chat-info { flex: 1; }
+        .chat-name { font-weight: bold; font-size: 16px; color: #111; display: flex; justify-content: space-between; }
+        .chat-time { font-size: 12px; color: #888; font-weight: normal; }
+        .chat-last-msg { font-size: 13px; color: #666; margin-top: 4px; display: flex; justify-content: space-between; }
+        .unread-badge { background: #25d366; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold; }
+
+        /* Individual Active Chat Room Screen */
+        #chat-room {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('twoofus.png') center/cover no-repeat;
+            display: none;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .room-header {
+            background: #008069;
+            color: white;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .room-header .back-btn {
+            background: none; border: none; color: white; font-size: 20px; cursor: pointer;
+        }
+
+        .room-header .user-title { flex: 1; font-weight: bold; font-size: 16px; }
+
+        .room-header button {
+            background: none; border: none; color: white; font-size: 18px; cursor: pointer; margin-left: 8px;
+        }
+
+        #chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+
+        /* Left / Right Messages */
+        .message {
+            max-width: 75%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            word-wrap: break-word;
+            line-height: 1.4;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        }
+
+        .sent {
+            background: #d9fdd3;
+            color: #111;
+            align-self: flex-end;
+            border-top-right-radius: 2px;
+        }
+
+        .received {
+            background: #ffffff;
+            color: #111;
+            align-self: flex-start;
+            border-top-left-radius: 2px;
+        }
+
+        .input-area { padding: 8px; background: #f0f0f0; display: flex; gap: 8px; align-items: center; }
+        .input-area input { flex: 1; padding: 10px 14px; border: none; border-radius: 20px; outline: none; font-size: 15px; }
+        .send-btn { background: #008069; color: white; border: none; padding: 10px 16px; border-radius: 50%; font-weight: bold; cursor: pointer; }
+
+        /* Video / Call Screen Container */
         #video-container { display: none; background: #000; position: relative; height: 220px; width: 100%; }
         video { width: 100%; height: 100%; object-fit: cover; }
         #local-video { width: 80px; height: 110px; position: absolute; bottom: 10px; right: 10px; border: 2px solid white; border-radius: 8px; z-index: 10; }
         .end-call-btn { position: absolute; top: 10px; right: 10px; background: #ff3333; color: white; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; z-index: 11; font-weight: bold; }
 
-        #chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 15px; word-wrap: break-word; }
-        .sent { background: #ff4d6d; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .received { background: rgba(255, 255, 255, 0.9); color: #333; align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        /* Settings Modal Overlay */
+        #settings-modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 30;
+            justify-content: center;
+            align-items: center;
+        }
 
-        .input-area { padding: 10px; background: rgba(255, 255, 255, 0.9); display: flex; gap: 8px; border-top: 1px solid #ffe3e8; }
-        input { flex: 1; padding: 12px; border: 1px solid #ffccd5; border-radius: 20px; outline: none; font-size: 15px; }
-        .send-btn { background: #ff4d6d; color: white; border: none; padding: 0 18px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .settings-card {
+            background: #fff;
+            width: 85%;
+            max-width: 340px;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .settings-card h3 { margin-bottom: 15px; color: #008069; }
+        .setting-row { margin-bottom: 12px; text-align: left; }
+        .setting-row label { display: block; font-size: 13px; color: #666; margin-bottom: 4px; font-weight: bold; }
+        .setting-row select, .setting-row input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; }
+        .close-settings { width: 100%; padding: 10px; background: #008069; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .logout-btn-settings { width: 100%; padding: 10px; background: #d90429; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -155,7 +291,7 @@
         <!-- Auth / Login View -->
         <div id="auth-screen">
             <div class="auth-card">
-                <h2>Welcome Back 💕</h2>
+                <h2>Welcome 💕</h2>
 
                 <div class="tab-buttons">
                     <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
@@ -185,28 +321,91 @@
             </div>
         </div>
 
-        <!-- Main App View -->
-        <div id="chat-screen">
-            <div class="header">
-                <span>Us Only 💕</span>
-                <div class="header-actions">
-                    <button onclick="startCall(false)">📞</button>
-                    <button onclick="startCall(true)">📹</button>
-                    <button onclick="logout()">🚪</button>
+        <!-- Main WhatsApp-Style View -->
+        <div id="main-app">
+            <div class="wa-header">
+                <div class="wa-header-top">
+                    <span>WhatsApp</span>
+                    <div class="wa-header-icons">
+                        <button>🔍</button>
+                        <button onclick="openSettings()">⚙️</button>
+                    </div>
+                </div>
+                <div class="wa-tabs">
+                    <div class="wa-tab active">Chats</div>
+                    <div class="wa-tab">Status</div>
+                    <div class="wa-tab">Calls</div>
                 </div>
             </div>
 
-            <div id="video-container">
-                <button class="end-call-btn" onclick="endCall()">End</button>
-                <video id="remote-video" autoplay playsinline></video>
-                <video id="local-video" autoplay playsinline muted></video>
+            <!-- Chat Panel List -->
+            <div id="chat-panel">
+                <div class="chat-item" onclick="openChatRoom()">
+                    <img src="twoofus.png" class="avatar" alt="avatar">
+                    <div class="chat-info">
+                        <div class="chat-name">
+                            <span id="partner-name">My Partner ❤️</span>
+                            <span class="chat-time" id="last-time">12:00 PM</span>
+                        </div>
+                        <div class="chat-last-msg">
+                            <span id="last-msg-preview">Tap to start messaging...</span>
+                            <span class="unread-badge">1</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div id="chat-box"></div>
 
-            <div class="input-area">
-                <input type="text" id="message-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage()">
-                <button class="send-btn" onclick="sendMessage()">Send</button>
+            <!-- Individual Chat Room View -->
+            <div id="chat-room">
+                <div class="room-header">
+                    <button class="back-btn" onclick="closeChatRoom()">←</button>
+                    <span class="user-title" id="chat-header-title">My Partner ❤️</span>
+                    <button onclick="startCall(false)">📞</button>
+                    <button onclick="startCall(true)">📹</button>
+                    <button onclick="openSettings()">⚙️</button>
+                </div>
+
+                <div id="video-container">
+                    <button class="end-call-btn" onclick="endCall()">End</button>
+                    <video id="remote-video" autoplay playsinline></video>
+                    <video id="local-video" autoplay playsinline muted></video>
+                </div>
+
+                <div id="chat-box"></div>
+
+                <div class="input-area">
+                    <input type="text" id="message-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage()">
+                    <button class="send-btn" onclick="sendMessage()">➔</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal">
+            <div class="settings-card">
+                <h3>App Settings</h3>
+
+                <div class="setting-row">
+                    <label>Font Color</label>
+                    <input type="color" id="setting-color" value="#111111" onchange="updateFontColor(this.value)">
+                </div>
+
+                <div class="setting-row">
+                    <label>Wallpaper Background</label>
+                    <input type="file" id="setting-bg" accept="image/*" onchange="updateWallpaper(event)">
+                </div>
+
+                <div class="setting-row">
+                    <label>Ringtone Sound</label>
+                    <select id="setting-ringtone">
+                        <option value="default.mp3">Classic Bell</option>
+                        <option value="romantic.mp3">Chime</option>
+                        <option value="silent">Silent</option>
+                    </select>
+                </div>
+
+                <button class="close-settings" onclick="closeSettings()">Save & Close</button>
+                <button class="logout-btn-settings" onclick="logout()">Log Out</button>
             </div>
         </div>
     </div>
@@ -218,15 +417,15 @@
         import { getDatabase, ref, push, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
-    apiKey: "AIzaSyDJ4eGBufpJ5jpV6yoZ91CiO40JOGeu1to",
-    authDomain: "love-chat-7a40d.firebaseapp.com",
-    databaseURL: "https://love-chat-7a40d-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "love-chat-7a40d",
-    storageBucket: "love-chat-7a40d.firebasestorage.app",
-    messagingSenderId: "940509187617",
-    appId: "1:940509187617:web:c00bed772ef498be4c1d60",
-    measurementId: "G-Q5L1Q6B3GD"
-};
+            apiKey: "AIzaSyDJ4eGBufpJ5jpV6yoZ91CiO40JOGeu1to",
+            authDomain: "love-chat-7a40d.firebaseapp.com",
+            databaseURL: "https://love-chat-7a40d-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "love-chat-7a40d",
+            storageBucket: "love-chat-7a40d.firebasestorage.app",
+            messagingSenderId: "940509187617",
+            appId: "1:940509187617:web:c00bed772ef498be4c1d60",
+            measurementId: "G-Q5L1Q6B3GD"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -247,7 +446,7 @@
                 }
             } else {
                 document.getElementById('auth-screen').style.display = 'flex';
-                document.getElementById('chat-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'none';
             }
         });
 
@@ -282,15 +481,8 @@
             const password = document.getElementById('reg-password').value;
             const confirmPassword = document.getElementById('reg-confirm-password').value;
 
-            if (!email || !password) {
-                showError('Please fill in all fields.');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                showError('Passwords do not match!');
-                return;
-            }
+            if (!email || !password) { showError('Please fill in all fields.'); return; }
+            if (password !== confirmPassword) { showError('Passwords do not match!'); return; }
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -298,25 +490,17 @@
                 await set(ref(db, 'users/' + user.uid), { role, email });
                 localStorage.setItem('user_role', role);
                 myRole = role;
-            } catch (error) {
-                showError(error.message);
-            }
+            } catch (error) { showError(error.message); }
         };
 
         window.handleLogin = async function() {
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
 
-            if (!email || !password) {
-                showError('Please enter email and password.');
-                return;
-            }
+            if (!email || !password) { showError('Please enter email and password.'); return; }
 
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                showError('Login failed: ' + error.message);
-            }
+            try { await signInWithEmailAndPassword(auth, email, password); } 
+            catch (error) { showError('Login failed: ' + error.message); }
         };
 
         window.logout = function() {
@@ -328,7 +512,7 @@
 
         function initApp() {
             document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('chat-screen').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'flex';
 
             const myPeerId = myRole === 'boy' ? 'love-app-boy' : 'love-app-girl';
             peer = new Peer(myPeerId);
@@ -349,6 +533,27 @@
             listenForMessages();
         }
 
+        window.openChatRoom = function() { document.getElementById('chat-room').style.display = 'flex'; };
+        window.closeChatRoom = function() { document.getElementById('chat-room').style.display = 'none'; };
+
+        window.openSettings = function() { document.getElementById('settings-modal').style.display = 'flex'; };
+        window.closeSettings = function() { document.getElementById('settings-modal').style.display = 'none'; };
+
+        window.updateFontColor = function(color) {
+            document.getElementById('chat-box').style.color = color;
+        };
+
+        window.updateWallpaper = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    document.getElementById('chat-room').style.backgroundImage = `url('${evt.target.result}')`;
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
         window.startCall = async function(videoEnabled) {
             const targetPeerId = myRole === 'boy' ? 'love-app-girl' : 'love-app-boy';
             try {
@@ -359,9 +564,7 @@
                     document.getElementById('remote-video').srcObject = remoteStream;
                 });
                 currentCall = call;
-            } catch (err) {
-                alert("Microphone/Camera permission required!");
-            }
+            } catch (err) { alert("Microphone/Camera permission required!"); }
         };
 
         function setupVideoUI(videoEnabled, stream) {
@@ -384,12 +587,20 @@
                 chatBox.innerHTML = '';
                 const data = snapshot.val();
                 if (data) {
-                    Object.values(data).forEach(msg => {
+                    const msgArray = Object.values(data);
+                    msgArray.forEach(msg => {
                         const div = document.createElement('div');
-                        div.className = `message ${msg.sender === myRole ? 'sent' : 'received'}`;
+                        // Crucial Left / Right Logic:
+                        const isSentByMe = msg.sender === myRole;
+                        div.className = `message ${isSentByMe ? 'sent' : 'received'}`;
                         div.textContent = msg.text;
                         chatBox.appendChild(div);
                     });
+
+                    const lastMsg = msgArray[msgArray.length - 1];
+                    if (lastMsg) {
+                        document.getElementById('last-msg-preview').textContent = lastMsg.text;
+                    }
                     chatBox.scrollTop = chatBox.scrollHeight;
                 }
             });
