@@ -22,8 +22,8 @@
         .app-container {
             width: 100%;
             height: 100%;
-            max-width: 430px; /* Standard phone width */
-            max-height: 850px; /* Standard phone height */
+            max-width: 430px;
+            max-height: 850px;
             position: relative;
             background: #fff;
             overflow: hidden;
@@ -32,7 +32,6 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
-        /* On mobile devices, fill the entire screen */
         @media (max-width: 480px) {
             .app-container {
                 max-width: 100%;
@@ -41,7 +40,6 @@
             }
         }
 
-        /* Desktop border curve */
         @media (min-width: 481px) {
             .app-container {
                 border-radius: 36px;
@@ -49,36 +47,69 @@
             }
         }
 
-        /* Auth Screen with Hands.jpg */
+        /* Auth Screen with hands.png background */
         #auth-screen {
             height: 100%;
             width: 100%;
-            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('Hands.jpg') center/cover no-repeat;
+            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('hands.png') center/cover no-repeat;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .auth-card {
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(10px);
-            padding: 30px 25px;
+            padding: 25px 20px;
             border-radius: 20px;
-            width: 85%;
-            max-width: 320px;
+            width: 88%;
+            max-width: 340px;
             text-align: center;
             box-shadow: 0 10px 25px rgba(0,0,0,0.25);
         }
 
-        .auth-card h2 { color: #ff4d6d; margin-bottom: 20px; font-size: 22px; }
+        .auth-card h2 { color: #ff4d6d; margin-bottom: 15px; font-size: 22px; }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #ffccd5;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            background: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: #ff4d6d;
+        }
+
+        .tab-btn.active {
+            background: #ff4d6d;
+            color: #fff;
+        }
+
         .auth-card select, .auth-card input {
-            width: 100%; padding: 12px; margin-bottom: 12px;
-            border: 1px solid #ffccd5; border-radius: 10px; outline: none; font-size: 15px;
+            width: 100%; padding: 10px 12px; margin-bottom: 10px;
+            border: 1px solid #ffccd5; border-radius: 10px; outline: none; font-size: 14px;
         }
 
         .auth-btn {
             width: 100%; padding: 12px; background: #ff4d6d; color: white;
             border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .error-msg {
+            color: #d90429;
+            font-size: 13px;
+            margin-bottom: 10px;
+            display: none;
+            font-weight: bold;
         }
 
         /* Main Chat Screen with twoofus.png */
@@ -125,12 +156,32 @@
         <div id="auth-screen">
             <div class="auth-card">
                 <h2>Welcome Back 💕</h2>
-                <select id="role-select">
-                    <option value="boy">Boy</option>
-                    <option value="girl">Girl</option>
-                </select>
-                <input type="password" id="pass-input" placeholder="Enter Secret Passcode">
-                <button class="auth-btn" onclick="login()">Enter Our Space</button>
+
+                <div class="tab-buttons">
+                    <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+                    <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>
+                </div>
+
+                <div id="error-box" class="error-msg"></div>
+
+                <!-- Sign In Form -->
+                <div id="login-form">
+                    <input type="text" id="login-username" placeholder="Username">
+                    <input type="password" id="login-password" placeholder="Password">
+                    <button class="auth-btn" onclick="handleLogin()">Sign In</button>
+                </div>
+
+                <!-- Create Account Form -->
+                <div id="register-form" style="display: none;">
+                    <input type="text" id="reg-username" placeholder="Username">
+                    <select id="reg-role">
+                        <option value="boy">Boy</option>
+                        <option value="girl">Girl</option>
+                    </select>
+                    <input type="password" id="reg-password" placeholder="Create Password">
+                    <input type="password" id="reg-confirm-password" placeholder="Confirm Password">
+                    <button class="auth-btn" onclick="handleRegister()">Create Account</button>
+                </div>
             </div>
         </div>
 
@@ -170,11 +221,86 @@
             initApp();
         }
 
-        function login() {
-            const role = document.getElementById('role-select').value;
-            localStorage.setItem('user_role', role);
-            myRole = role;
-            initApp();
+        function switchTab(tab) {
+            showError('');
+            if (tab === 'login') {
+                document.getElementById('tab-login').classList.add('active');
+                document.getElementById('tab-register').classList.remove('active');
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('register-form').style.display = 'none';
+            } else {
+                document.getElementById('tab-register').classList.add('active');
+                document.getElementById('tab-login').classList.remove('active');
+                document.getElementById('register-form').style.display = 'block';
+                document.getElementById('login-form').style.display = 'none';
+            }
+        }
+
+        function showError(msg) {
+            const errBox = document.getElementById('error-box');
+            if (msg) {
+                errBox.textContent = msg;
+                errBox.style.display = 'block';
+            } else {
+                errBox.style.display = 'none';
+            }
+        }
+
+        async function handleRegister() {
+            const username = document.getElementById('reg-username').value.trim();
+            const role = document.getElementById('reg-role').value;
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
+
+            if (!username || !password) {
+                showError('Please fill in all fields.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match!');
+                return;
+            }
+
+            const res = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, role, password })
+            });
+
+            const data = await res.json();
+            if (data.status === 'success') {
+                localStorage.setItem('user_role', role);
+                myRole = role;
+                initApp();
+            } else {
+                showError(data.message || 'Registration failed');
+            }
+        }
+
+        async function handleLogin() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!username || !password) {
+                showError('Please enter username and password.');
+                return;
+            }
+
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await res.json();
+            if (data.status === 'success') {
+                localStorage.setItem('user_role', data.role);
+                myRole = data.role;
+                initApp();
+            } else {
+                showError(data.message || 'Password incorrect, try again');
+            }
         }
 
         function logout() {
