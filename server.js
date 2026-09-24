@@ -24,26 +24,35 @@ const server = http.createServer((req, res) => {
     const reqUrl = decodeURIComponent(req.url);
 
     if (req.method === 'GET' && reqUrl === '/') {
-        fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
-            if (err) { res.writeHead(500); res.end('Server Error'); }
-            else { res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(content); }
+        return fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
+            if (err) { 
+                res.writeHead(500, { 'Content-Type': 'text/plain' }); 
+                return res.end('Server Error'); 
+            }
+            res.writeHead(200, { 'Content-Type': 'text/html' }); 
+            res.end(content);
         });
-    } else if (req.method === 'GET') {
+    } 
+
+    if (req.method === 'GET') {
         const ext = path.extname(reqUrl);
         if (MIME_TYPES[ext]) {
             const filePath = path.join(__dirname, reqUrl);
-            fs.readFile(filePath, (err, content) => {
-                if (err) { res.writeHead(404); res.end('File Not Found'); }
-                else { res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] }); res.end(content); }
+            return fs.readFile(filePath, (err, content) => {
+                if (err) { 
+                    res.writeHead(404, { 'Content-Type': 'text/plain' }); 
+                    return res.end('File Not Found'); 
+                }
+                res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] }); 
+                res.end(content);
             });
-            return;
         }
     }
 
     if (req.method === 'POST' && reqUrl === '/register') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
-        req.on('end', () => {
+        return req.on('end', () => {
             try {
                 const { username, role, password } = JSON.parse(body);
                 if (users[username]) {
@@ -54,13 +63,16 @@ const server = http.createServer((req, res) => {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ status: 'success' }));
             } catch (e) {
-                res.writeHead(400); res.end('Invalid JSON');
+                res.writeHead(400, { 'Content-Type': 'text/plain' }); 
+                res.end('Invalid JSON');
             }
         });
-    } else if (req.method === 'POST' && reqUrl === '/login') {
+    } 
+
+    if (req.method === 'POST' && reqUrl === '/login') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
-        req.on('end', () => {
+        return req.on('end', () => {
             try {
                 const { username, password } = JSON.parse(body);
                 const user = users[username];
@@ -71,28 +83,36 @@ const server = http.createServer((req, res) => {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ status: 'success', role: user.role }));
             } catch (e) {
-                res.writeHead(400); res.end('Invalid JSON');
+                res.writeHead(400, { 'Content-Type': 'text/plain' }); 
+                res.end('Invalid JSON');
             }
         });
-    } else if (req.method === 'GET' && reqUrl === '/messages') {
+    } 
+
+    if (req.method === 'GET' && reqUrl === '/messages') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(messages));
-    } else if (req.method === 'POST' && reqUrl === '/send') {
+        return res.end(JSON.stringify(messages));
+    } 
+
+    if (req.method === 'POST' && reqUrl === '/send') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
-        req.on('end', () => {
+        return req.on('end', () => {
             try {
                 const data = JSON.parse(body);
                 messages.push(data);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ status: 'success' }));
             } catch (e) {
-                res.writeHead(400); res.end('Invalid JSON');
+                res.writeHead(400, { 'Content-Type': 'text/plain' }); 
+                res.end('Invalid JSON');
             }
         });
-    } else {
-        res.writeHead(404); res.end('Not Found');
     }
+
+    // Default 404 Route
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
 });
 
 const PORT = process.env.PORT || 3000;
