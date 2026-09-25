@@ -820,7 +820,6 @@
             try {
                 return await navigator.mediaDevices.getUserMedia(options);
             } catch (err) {
-                // Fallback for mobile environment back/front facing modes
                 if (options.video) {
                     try {
                         return await navigator.mediaDevices.getUserMedia({

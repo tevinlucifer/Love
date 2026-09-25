@@ -1,13 +1,14 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const WebSocket = require('ws');
 
-// In-memory data stores
+// In-memory persistent data stores
 let messages = [
-    { sender: 'girl', text: 'Hey ❤️ Welcome to our WhatsApp app!', timestamp: Date.now() }
+    { id: 1, sender: 'girl', text: 'Hey ❤️ Welcome to our WhatsApp app!', timestamp: Date.now(), status: 'read' }
 ];
 let statuses = [];
-let users = {}; 
+let users = {};
 
 const MIME_TYPES = {
     '.html': 'text/html',
@@ -25,7 +26,6 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-    // Enable CORS for cross-origin feature support (calling/signaling)
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -38,34 +38,34 @@ const server = http.createServer((req, res) => {
     const reqUrl = decodeURIComponent(req.url);
 
     // Serve index.html
-    if (req.method === 'GET' && reqUrl === '/') {
+    if (req.method === 'GET' && (reqUrl === '/' || reqUrl === '/index.html')) {
         return fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
-            if (err) { 
-                res.writeHead(500, { 'Content-Type': 'text/plain' }); 
-                return res.end('Server Error: index.html missing'); 
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                return res.end('Server Error: index.html missing');
             }
-            res.writeHead(200, { 'Content-Type': 'text/html' }); 
+            res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(content);
         });
-    } 
+    }
 
-    // Serve static files (Images, CSS, JS, Audio)
+    // Serve Static Files
     if (req.method === 'GET') {
         const ext = path.extname(reqUrl);
         if (MIME_TYPES[ext]) {
             const filePath = path.join(__dirname, reqUrl);
             return fs.readFile(filePath, (err, content) => {
-                if (err) { 
-                    res.writeHead(404, { 'Content-Type': 'text/plain' }); 
-                    return res.end('File Not Found'); 
+                if (err) {
+                    res.writeHead(404, { 'Content-Type': 'text/plain' });
+                    return res.end('File Not Found');
                 }
-                res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] }); 
+                res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] });
                 res.end(content);
             });
         }
     }
 
-    // Handle Registration
+    // Authentication API Endpoints
     if (req.method === 'POST' && reqUrl === '/register') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
@@ -73,21 +73,16 @@ const server = http.createServer((req, res) => {
             try {
                 const { username, email, role, password } = JSON.parse(body);
                 const userKey = email || username;
-                if (users[userKey]) {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    return res.end(JSON.stringify({ status: 'error', message: 'User already exists' }));
-                }
                 users[userKey] = { role, password, username: userKey };
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ status: 'success', role }));
             } catch (e) {
-                res.writeHead(400, { 'Content-Type': 'text/plain' }); 
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
                 res.end('Invalid JSON');
             }
         });
-    } 
+    }
 
-    // Handle Login
     if (req.method === 'POST' && reqUrl === '/login') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
@@ -98,69 +93,85 @@ const server = http.createServer((req, res) => {
                 const user = users[userKey];
                 if (!user || user.password !== password) {
                     res.writeHead(401, { 'Content-Type': 'application/json' });
-                    return res.end(JSON.stringify({ status: 'error', message: 'Password incorrect or user not found' }));
+                    return res.end(JSON.stringify({ status: 'error', message: 'Invalid credentials' }));
                 }
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ status: 'success', role: user.role }));
             } catch (e) {
-                res.writeHead(400, { 'Content-Type': 'text/plain' }); 
-                res.end('Invalid JSON');
-            }
-        });
-    } 
-
-    // Get Messages
-    if (req.method === 'GET' && reqUrl === '/messages') {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify(messages));
-    } 
-
-    // Send Message (Supports Text, Base64 Images, Audio Data)
-    if (req.method === 'POST' && reqUrl === '/send') {
-        let body = '';
-        req.on('data', chunk => { body += chunk.toString(); });
-        return req.on('end', () => {
-            try {
-                const data = JSON.parse(body);
-                if (!data.timestamp) data.timestamp = Date.now();
-                messages.push(data);
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ status: 'success', data }));
-            } catch (e) {
-                res.writeHead(400, { 'Content-Type': 'text/plain' }); 
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
                 res.end('Invalid JSON');
             }
         });
     }
 
-    // Get Statuses
+    // REST Fallback Endpoints
+    if (req.method === 'GET' && reqUrl === '/messages') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify(messages));
+    }
+
     if (req.method === 'GET' && reqUrl === '/statuses') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify(statuses));
     }
 
-    // Post Status Update
-    if (req.method === 'POST' && reqUrl === '/status') {
-        let body = '';
-        req.on('data', chunk => { body += chunk.toString(); });
-        return req.on('end', () => {
-            try {
-                const statusItem = JSON.parse(body);
-                if (!statusItem.timestamp) statusItem.timestamp = Date.now();
-                statuses.push(statusItem);
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ status: 'success' }));
-            } catch (e) {
-                res.writeHead(400, { 'Content-Type': 'text/plain' }); 
-                res.end('Invalid JSON');
-            }
-        });
-    }
-
-    // Default 404 Route
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not Found');
 });
 
+// WebSocket Server for Live Realtime Messaging
+const wss = new WebSocket.Server({ server });
+
+function broadcast(data) {
+    const payload = JSON.stringify(data);
+    wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(payload);
+        }
+    });
+}
+
+wss.on('connection', (ws) => {
+    // Send existing messages on join
+    ws.send(JSON.stringify({ type: 'INIT_MESSAGES', messages }));
+    ws.send(JSON.stringify({ type: 'INIT_STATUSES', statuses }));
+
+    ws.on('message', (messageStr) => {
+        try {
+            const data = JSON.parse(messageStr);
+            
+            if (data.type === 'NEW_MESSAGE') {
+                const msgObj = {
+                    id: Date.now(),
+                    sender: data.sender,
+                    text: data.text,
+                    timestamp: Date.now(),
+                    status: 'delivered'
+                };
+                messages.push(msgObj);
+                broadcast({ type: 'MESSAGE_RECEIVED', message: msgObj });
+            }
+
+            if (data.type === 'NEW_STATUS') {
+                const statusObj = {
+                    id: Date.now(),
+                    sender: data.sender,
+                    mediaUrl: data.mediaUrl,
+                    type: data.mediaType,
+                    timestamp: Date.now()
+                };
+                statuses.push(statusObj);
+                broadcast({ type: 'STATUS_RECEIVED', status: statusObj });
+            }
+
+            if (data.type === 'TYPING') {
+                broadcast({ type: 'USER_TYPING', sender: data.sender, isTyping: data.isTyping });
+            }
+        } catch (err) {
+            console.error('WebSocket Error:', err);
+        }
+    });
+});
+
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
